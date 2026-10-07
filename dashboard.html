@@ -1841,12 +1841,66 @@
  + '<a href="index.html" class="btn btn-primary" style="display:inline-block; text-decoration:none;">Voltar à plataforma</a></div>';
  }
 
+ // ── Segundo fator (2FA / TOTP) da administração ──
+ // Pede o código do aplicativo autenticador (Google Authenticator, Authy, Microsoft Authenticator...).
+ // Na primeira vez, mostra o QR Code para cadastrar o aplicativo. Só libera o painel com sessão aal2.
+ async function exigirSegundoFator() {
+ const mfa = supabaseClient.auth.mfa;
+ if (!mfa) return false; // biblioteca sem MFA: nunca libera sem o segundo fator
+ try {
+ const nivel = await mfa.getAuthenticatorAssuranceLevel();
+ if (nivel.data && nivel.data.currentLevel === 'aal2') return true;
+ const lista = await mfa.listFactors();
+ if (lista.error) return false;
+ let fator = (lista.data.totp || []).find(f => f.status === 'verified');
+ let cadastro = null;
+ if (!fator) {
+ // limpa tentativas de cadastro que ficaram pela metade
+ for (const f of (lista.data.all || [])) { if (f.factor_type === 'totp' && f.status !== 'verified') { try { await mfa.unenroll({ factorId: f.id }); } catch (e) {} } }
+ const en = await mfa.enroll({ factorType: 'totp', friendlyName: 'Administração ' + new Date().toISOString().slice(0, 10) });
+ if (en.error) return false;
+ fator = en.data; cadastro = en.data.totp;
+ }
+ return await new Promise(resolve => {
+ const ov = document.getElementById('admin-login-overlay');
+ ov.style.display = 'flex';
+ ov.textContent = '';
+ const card = document.createElement('div'); card.className = 'card'; card.style.cssText = 'width:400px; max-width:calc(100vw - 32px); text-align:center; margin:0;';
+ const h = document.createElement('h2'); h.style.cssText = "font-family:'Playfair Display',serif; margin-bottom:1rem; color:var(--white);"; h.textContent = 'Verificação em duas etapas';
+ const p = document.createElement('p'); p.style.cssText = 'color:var(--text-muted); font-size:14px; margin-bottom:1rem;';
+ p.textContent = cadastro ? 'Primeiro acesso: leia o QR Code com o aplicativo autenticador e digite o código de 6 dígitos que ele mostrar.' : 'Digite o código de 6 dígitos do seu aplicativo autenticador.';
+ card.append(h, p);
+ if (cadastro) {
+ const img = document.createElement('img'); img.src = cadastro.qr_code; img.alt = 'QR Code do autenticador'; img.style.cssText = 'width:180px; height:180px; background:#fff; padding:8px; border-radius:8px; margin-bottom:.75rem;';
+ const seg = document.createElement('div'); seg.style.cssText = 'font-size:12px; color:var(--text-muted); word-break:break-all; margin-bottom:1rem;';
+ seg.textContent = 'Se não conseguir ler o QR: ' + cadastro.secret;
+ card.append(img, seg);
+ }
+ const inp = document.createElement('input'); inp.className = 'form-input'; inp.inputMode = 'numeric'; inp.autocomplete = 'one-time-code'; inp.maxLength = 6; inp.placeholder = '000000'; inp.style.cssText = 'text-align:center; letter-spacing:6px; font-size:20px; margin-bottom:1rem;';
+ const bt = document.createElement('button'); bt.className = 'btn btn-primary'; bt.style.cssText = 'width:100%; margin-bottom:1rem;'; bt.textContent = 'Confirmar';
+ const er = document.createElement('div'); er.style.cssText = 'color:#e05c6a; font-size:13px; display:none;';
+ card.append(inp, bt, er); ov.appendChild(card); inp.focus();
+ const confirmar = async () => {
+ const codigo = inp.value.replace(/\D/g, '');
+ if (codigo.length !== 6) { er.textContent = 'Digite os 6 números do código.'; er.style.display = 'block'; return; }
+ bt.disabled = true; er.style.display = 'none';
+ const r = await mfa.challengeAndVerify({ factorId: fator.id, code: codigo });
+ if (r.error) { bt.disabled = false; inp.value = ''; er.textContent = 'Código incorreto ou expirado. Tente o próximo código do aplicativo.'; er.style.display = 'block'; return; }
+ resolve(true);
+ };
+ bt.addEventListener('click', confirmar);
+ inp.addEventListener('keydown', e => { if (e.key === 'Enter') confirmar(); });
+ });
+ } catch (e) { return false; }
+ }
+
  // Inicializar carregamento de conteúdos
  window.addEventListener('DOMContentLoaded', async () => {
  // Verifica se já está logado
  const { data: { session } } = await supabaseClient.auth.getSession();
  if (session) {
  if (!(await ehAdministracao(session))) { mostrarAcessoNegado(); return; }
+ if (!(await exigirSegundoFator())) { mostrarAcessoNegado(); return; }
  document.getElementById('admin-login-overlay').style.display = 'none';
  carregarConteudosAdmin();
  loadUsers();
@@ -1883,6 +1937,7 @@
  }
  
  if (!(await ehAdministracao(data.session))) { mostrarAcessoNegado(); return; }
+ if (!(await exigirSegundoFator())) { mostrarAcessoNegado(); return; }
  document.getElementById('admin-login-overlay').style.display = 'none';
  carregarConteudosAdmin();
  loadUsers();
