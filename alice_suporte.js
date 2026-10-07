@@ -150,6 +150,23 @@
 
         }
 
+        #alice-min-btn, #alice-close-btn {
+            min-width: 32px;
+            min-height: 32px;
+        }
+
+        #alice-min-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* área de toque maior para o traço minimizado */
+        #alice-button.minimizado { position: relative; }
+        #alice-button.minimizado::after { content: ''; position: absolute; left: -8px; right: -8px; top: -14px; bottom: -14px; }
+
         #alice-close-btn {
 
             background: transparent;
@@ -306,7 +323,10 @@
 
                 <h3><span>A</span> Suporte Alice</h3>
 
-                <button id="alice-close-btn">&times;</button>
+                <span style="display:flex; gap:6px;">
+                    <button id="alice-min-btn" type="button" aria-label="Minimizar suporte" title="Minimizar">&minus;</button>
+                    <button id="alice-close-btn" type="button" aria-label="Fechar suporte">&times;</button>
+                </span>
 
             </div>
 
@@ -392,7 +412,7 @@
         </div>
 
         <div id="alice-button" role="button" tabindex="0" aria-label="Suporte Alice"
-             title="1 clique: minimizar ou mostrar  •  2 cliques: abrir o suporte  •  arraste para mover">A</div>
+             title="Clique para abrir o suporte  •  arraste para mover">A</div>
 
     `;
 
@@ -535,27 +555,22 @@
         arrasto = null;
     });
 
-    // ── 1 clique: minimiza/mostra  •  2 cliques: abre o chamado ──
-    var cliques = 0, timerClique = null;
+    // ── 1 toque: abre/fecha o suporte (se estiver minimizado, só volta a aparecer) ──
     btn.addEventListener('click', function () {
         if (arrastou) { arrastou = false; return; } // foi um arrasto, não um clique
-        cliques++;
-        if (cliques === 1) {
-            timerClique = setTimeout(function () {
-                cliques = 0;
-                aplicarMinimizado(!btn.classList.contains('minimizado'));
-            }, 280);
-        } else {
-            clearTimeout(timerClique);
-            cliques = 0;
-            abrirChat();
-        }
+        if (btn.classList.contains('minimizado')) { aplicarMinimizado(false); return; }
+        if (box.style.display === 'flex') box.style.display = 'none';
+        else abrirChat();
     });
     btn.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirChat(); }
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); }
     });
 
 
+
+    document.getElementById('alice-min-btn').addEventListener('click', function () {
+        aplicarMinimizado(true);
+    });
 
     closeBtn.addEventListener('click', () => {
 
