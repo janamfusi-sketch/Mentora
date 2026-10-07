@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Análise de Vendas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { 
+            --purple: #5B2DA3; 
+            --blue: #3b82f6; 
+            --cyan: #06b6d4;
+            --indigo: #6366f1;
+            --green: #10b981;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --text: #1e293b; 
+            --text-muted: #64748B; 
+            --bg: #F8FAFC; 
+            --card: #ffffff; 
+            --border: #e2e8f0; 
+            --pill-bg: #f1f5f9;
+            --pill-text: #475569;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 4rem; }
+        
+        .header { padding: 2rem 0; margin-bottom: 1rem; }
+        .header h1 { font-family: 'Inter', sans-serif; font-size: 28px; margin-bottom: 0.5rem; color: #1e3a8a; font-weight: 700; }
+        .header h1 span { color: #1e3a8a; }
+        .header p { color: var(--text-muted); font-size: 14px; }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 1.5rem; }
+        
+        .card-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .fld { display: flex; flex-direction: column; gap: 0.5rem; }
+        .flbl { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .finp, .fsel { 
+            background: var(--bg); border: 1px solid var(--border); border-radius: 8px; 
+            padding: 0.75rem 1rem; color: var(--text); font-family: inherit; font-size: 14px; outline: none;
+        }
+        .finp:focus, .fsel:focus { border-color: var(--green); }
+
+        .domain-header { display: flex; gap: 1rem; margin-bottom: 1.5rem; margin-top: 1rem; }
+        .domain-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; flex-shrink: 0; }
+        .domain-info h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600; }
+        .domain-info h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+        .domain-info p { font-size: 13px; color: var(--text-muted); }
+
+        .sliders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .slider-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; }
+        .slider-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .slider-name { font-size: 13px; font-weight: 500; color: var(--text); padding-right: 1rem; line-height: 1.4; }
+        .slider-value { font-size: 16px; font-weight: 700; color: var(--green); }
+        input[type=range] { width: 100%; -webkit-appearance: none; height: 4px; border-radius: 2px; outline: none; cursor: pointer; margin-bottom: 0.5rem; background: #E2E8F0; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--green); cursor: pointer; border: none; }
+        .scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); }
+
+        .od-obs {
+            width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            padding: 1rem; color: var(--text); font-family: inherit; font-size: 13px; min-height: 80px;
+            resize: vertical; outline: none; margin-bottom: 2rem;
+        }
+        .od-obs:focus { border-color: var(--green); }
+
+        .pills-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .pill {
+            background: var(--pill-bg); color: var(--pill-text); border: 1px solid var(--border);
+            padding: 0.4rem 0.8rem; border-radius: 100px; font-size: 12px; cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .pill.active { background: var(--green); color: white; border-color: var(--green); }
+        .pill.active.mood-pill { border-color: var(--blue); color: var(--blue); background: rgba(59,130,246,0.1); }
+
+        .footer-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+        .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-analisar { background: var(--green); color: white; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-analisar:hover { background: #059669; }
+        .btn-analisar:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .resultado-box { display: none; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 1.5rem; margin-top: 2rem; line-height: 1.6; font-size: 14px; color: #065f46; }
+    </style>
+</head>
+<body>
+    <div class="header container">
+        <h1>Nova <span>Análise de Vendas</span></h1>
+        <p>Diagnóstico clínico sobre as competências de prospecção, fechamento e negociação do mentorado</p>
+    </div>
+
+    <div class="container">
+        
+        <!-- CONTEXTO -->
+        <div class="card-box">
+            <div class="section-header">MENTORADO(A) & CONTEXTO COMERCIAL</div>
+            <div class="form-row">
+                <div class="fld">
+                    <label class="flbl">MENTORADO(A) / VENDEDOR</label>
+                    <select class="fsel" id="sel-mentorado">
+                        <option value="">Selecione o profissional</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label class="flbl">DATA</label>
+                    <input class="finp" type="date" id="inp-data">
+                </div>
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+                <div class="fld">
+                    <label class="flbl">TIPO DE ENCONTRO</label>
+                    <select class="fsel" id="sel-encontro">
+                        <option value="">Selecione</option>
+                        <option>Clínica de Vendas (Roleplay / Simulação)</option>
+                        <option>Revisão do Funil de Vendas (Pipeline)</option>
+                        <option>Diagnóstico de Taxa de Conversão</option>
+                        <option>Sessão Individual</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label class="flbl">TICKET MÉDIO (Opcional)</label>
+                    <input class="finp" type="text" placeholder="Ex: R$ 5.000 (High Ticket / Alto Valor)" id="inp-sessao">
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMÍNIOS -->
+        <div class="card-box">
+            <div class="section-header">ESCALA CLÍNICA DE PERFORMANCE EM VENDAS</div>
+            
+            <div class="domain-block" id="domain-1">
+                <div class="domain-header" style="justify-content: space-between;">
+                    <div style="display: flex; gap: 1rem;">
+                        <div class="domain-icon" style="background:var(--cyan);">◈</div>
+                        <div class="domain-info">
+                            <h3>DOMÍNIO I</h3>
+                            <h2>Prospecção & Geração de Oportunidades</h2>
+                            <p>Disciplina, qualidade da abordagem fria e foco no Perfil Ideal de Cliente (ICP)</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" id="btn-toggle-d1" class="pill" onclick="toggleDomain('d1')" style="margin:0; border-color:var(--border);">Desativar Domínio</button>
+                    </div>
+                </div>
+                <div id="content-d1">
+                    <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Disciplina e consistência na rotina de prospecção ativa</span>
+                            <span class="slider-value" id="val-d1_prosp" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_prosp" data-color="var(--cyan)" oninput="updateSlider('d1_prosp', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Capacidade de identificar e qualificar o Perfil Ideal de Cliente (ICP)</span>
+                            <span class="slider-value" id="val-d1_icp" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_icp" data-color="var(--cyan)" oninput="updateSlider('d1_icp', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Qualidade da abordagem (Cold Call/Mail - Ligação/E-mail Frio) sem soar robótico</span>
+                            <span class="slider-value" id="val-d1_cold" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_cold" data-color="var(--cyan)" oninput="updateSlider('d1_cold', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Habilidade de gerar interesse e agendar reuniões (Conversão inicial)</span>
+                            <span class="slider-value" id="val-d1_conv" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_conv" data-color="var(--cyan)" oninput="updateSlider('d1_conv', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre funil e prospecção..."></textarea>
+                </div>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--indigo);">◎</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO II</h3>
+                        <h2>Investigação, Diagnóstico & Rapport</h2>
+                        <p>Habilidade de fazer as perguntas certas e entender a dor real do cliente</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Velocidade e profundidade do Rapport criado com o prospect</span>
+                            <span class="slider-value" id="val-d2_rap" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_rap" data-color="var(--indigo)" oninput="updateSlider('d2_rap', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Condução de reunião através de perguntas abertas e estratégicas</span>
+                            <span class="slider-value" id="val-d2_perg" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_perg" data-color="var(--indigo)" oninput="updateSlider('d2_perg', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Escuta ativa (entender as entrelinhas e a dor real)</span>
+                            <span class="slider-value" id="val-d2_esc" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_esc" data-color="var(--indigo)" oninput="updateSlider('d2_esc', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Habilidade de mostrar ao cliente o que ele perde se não comprar (Custo da inércia)</span>
+                            <span class="slider-value" id="val-d2_dor" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_dor" data-color="var(--indigo)" oninput="updateSlider('d2_dor', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre a forma de conduzir reuniões..."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--orange);">⊙</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO III</h3>
+                        <h2>Apresentação da Solução & Objeções</h2>
+                        <p>Clareza ao demonstrar valor e controle emocional diante da resistência do cliente</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Apresentação focada em valor, não apenas em características</span>
+                            <span class="slider-value" id="val-d3_val" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_val" data-color="var(--orange)" oninput="updateSlider('d3_val', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Postura assertiva e firmeza ao comunicar preços e condições</span>
+                            <span class="slider-value" id="val-d3_preco" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_preco" data-color="var(--orange)" oninput="updateSlider('d3_preco', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Resiliência e estabilidade emocional diante de objeções severas</span>
+                            <span class="slider-value" id="val-d3_res" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_res" data-color="var(--orange)" oninput="updateSlider('d3_res', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Habilidade de contornar objeções e reconectar à dor do cliente</span>
+                            <span class="slider-value" id="val-d3_cont" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_cont" data-color="var(--orange)" oninput="updateSlider('d3_cont', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre o pitch e o manejo de objeções..."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--green);">◇</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO IV</h3>
+                        <h2>Fechamento, Tração & Acompanhamento (Follow-up)</h2>
+                        <p>A força de fechar o negócio (Closing), senso de urgência e cadência de acompanhamento</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Assertividade ao pedir o fechamento (Call to Action / Chamada para Ação final)</span>
+                            <span class="slider-value" id="val-d4_clos" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_clos" data-color="var(--green)" oninput="updateSlider('d4_clos', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Habilidade de criar Senso de Urgência autêntico na negociação</span>
+                            <span class="slider-value" id="val-d4_urg" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_urg" data-color="var(--green)" oninput="updateSlider('d4_urg', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Disciplina, cadência e persistência no processo de acompanhamento (Follow-up)</span>
+                            <span class="slider-value" id="val-d4_fol" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_fol" data-color="var(--green)" oninput="updateSlider('d4_fol', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Manutenção de energia e motivação após sequências de "Nãos"</span>
+                            <span class="slider-value" id="val-d4_n" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_n" data-color="var(--green)" oninput="updateSlider('d4_n', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre fechamento (Closing) e persistência..."></textarea>
+            </div>
+
+            <div class="domain-block" id="domain-5">
+                <div class="domain-header" style="justify-content: space-between;">
+                    <div style="display: flex; gap: 1rem;">
+                        <div class="domain-icon" style="background:var(--blue);">📊</div>
+                        <div class="domain-info">
+                            <h3>DOMÍNIO V</h3>
+                            <h2>Gestão de Carteira & CRM</h2>
+                            <p>Manutenção e expansão de clientes, e higienização do Funil (Pipeline)</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" id="btn-toggle-d5" class="pill" onclick="toggleDomain('d5')" style="margin:0; border-color:var(--border);">Desativar Domínio</button>
+                    </div>
+                </div>
+                <div id="content-d5">
+                    <div class="sliders-grid">
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Disciplina no preenchimento e atualização diária do CRM</span>
+                                <span class="slider-value" id="val-d5_crm" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_crm" data-color="var(--blue)" oninput="updateSlider('d5_crm', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Organização do funil (Pipeline) garantindo volume e cadência saudáveis</span>
+                                <span class="slider-value" id="val-d5_pipe" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_pipe" data-color="var(--blue)" oninput="updateSlider('d5_pipe', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Capacidade de cultivar relacionamento para vendas adicionais e upgrades (Cross-sell/Upsell)</span>
+                                <span class="slider-value" id="val-d5_up" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_up" data-color="var(--blue)" oninput="updateSlider('d5_up', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Nível de parceria consultiva estabelecida com clientes ativos</span>
+                                <span class="slider-value" id="val-d5_cons" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_cons" data-color="var(--blue)" oninput="updateSlider('d5_cons', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                    </div>
+                    <textarea class="od-obs" placeholder="Observações sobre organização comercial..."></textarea>
+                </div>
+            </div>
+
+            <div class="domain-block" id="domain-6">
+                <div class="domain-header" style="justify-content: space-between;">
+                    <div style="display: flex; gap: 1rem;">
+                        <div class="domain-icon" style="background:var(--purple);">🛍️</div>
+                        <div class="domain-info">
+                            <h3>DOMÍNIO VI</h3>
+                            <h2>Venda Direta & Atendimento Receptivo</h2>
+                            <p>Recepção, demonstração e fechamento rápido para clientes de varejo, loja ou salão</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" id="btn-toggle-d6" class="pill" onclick="toggleDomain('d6')" style="margin:0; border-color:var(--border);">Desativar Domínio</button>
+                    </div>
+                </div>
+                <div id="content-d6">
+                    <div class="sliders-grid">
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Recepção calorosa e leitura rápida do perfil do cliente na loja/salão</span>
+                                <span class="slider-value" id="val-d6_rec" style="color:var(--purple);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d6_rec" data-color="var(--purple)" oninput="updateSlider('d6_rec', this.value, 'var(--purple)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Capacidade de demonstrar o produto gerando desejo e conexão emocional</span>
+                                <span class="slider-value" id="val-d6_dem" style="color:var(--purple);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d6_dem" data-color="var(--purple)" oninput="updateSlider('d6_dem', this.value, 'var(--purple)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Agilidade para entender a necessidade e oferecer venda adicional</span>
+                                <span class="slider-value" id="val-d6_crs" style="color:var(--purple);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d6_crs" data-color="var(--purple)" oninput="updateSlider('d6_crs', this.value, 'var(--purple)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Persuasão para contornar objeções na hora e evitar que o cliente vá embora</span>
+                                <span class="slider-value" id="val-d6_fech" style="color:var(--purple);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d6_fech" data-color="var(--purple)" oninput="updateSlider('d6_fech', this.value, 'var(--purple)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                    </div>
+                    <textarea class="od-obs" placeholder="Observações sobre o atendimento de venda direta..."></textarea>
+                </div>
+            </div>
+
+            <div style="margin-bottom:2rem; margin-top:-1rem;">
+                <div class="flbl" style="margin-bottom:0.75rem;">SABOTADORES DE VENDAS (GARGALOS OBSERVADOS)</div>
+                <div class="pills-container" id="gatilhos">
+                    <div class="pill">Medo da rejeição</div><div class="pill">Descontos precoces (para "garantir")</div><div class="pill">Falar demais / Ouvir de menos</div><div class="pill">Falta de acompanhamento (Follow-up)</div><div class="pill">Desorganização de CRM</div><div class="pill">Otimismo cego (Happy Ears)</div><div class="pill">Síndrome do vira-lata (achar que está caro)</div><div class="pill">Falta de conhecimento do produto</div><div class="pill">Prospecção inconstante</div><div class="pill">Apego emocional a negócios perdidos (Losts)</div><div class="pill">Ansiedade no fechamento</div>
+                </div>
+            </div>
+            <textarea class="od-obs" placeholder="Descrição de como os sabotadores impactam a taxa de conversão..."></textarea>
+
+        </div>
+
+        <!-- NOTAS FINAIS -->
+        <div class="card-box">
+            <div class="section-header">NOTAS GERAIS DA SESSÃO</div>
+            <textarea class="od-obs" id="notas-gerais" placeholder="Pontos de melhoria, script de vendas atual, gargalos na abordagem..." style="margin-bottom:1.5rem;"></textarea>
+            
+            <div class="flbl" style="margin-bottom:0.75rem;">NÍVEL DE PRONTIDÃO EM VENDAS (PERFIL ATUAL)</div>
+            <div class="pills-container" id="prontidao">
+                <div class="pill mood-btn">Fechador Afiado ("Hunter" / Caçador)</div>
+                <div class="pill mood-btn">Consistente e Estável</div>
+                <div class="pill mood-btn">Esforçado, mas baixa conversão</div>
+                <div class="pill mood-btn">Patinando nas Objeções</div>
+                <div class="pill mood-btn">Desmotivado / Com medo de vender</div>
+            </div>
+        </div>
+
+        <div class="footer-actions">
+            <button class="btn-cancel" onclick="MentoraPonte.voltar()">Voltar para Visão Geral</button>
+            <button class="btn-analisar" id="btn-analisar" onclick="salvarEAnalisar()">Salvar e gerar análise</button>
+        </div>
+
+        <div class="resultado-box" id="resultado">
+            <div style="font-weight:700; margin-bottom:1rem; font-size:16px;">📊 Diagnóstico de Vendas (Agente Mentóra) Salvo</div>
+            <div id="resultado-texto" style="white-space: pre-line;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const EDGE_URL = 'https://duhaqygpyamjelwxylmn.supabase.co/functions/v1/proxy-ia';
+        
+        document.getElementById('inp-data').valueAsDate = new Date();
+
+        function updateSlider(id, value, color) { 
+            const valEl = document.getElementById('val-'+id);
+            if(valEl) { valEl.textContent = value; valEl.style.color = color; }
+            const s = document.getElementById(id); 
+            if(s) {
+                const pct = value; 
+                s.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #E2E8F0 ${pct}%, #E2E8F0 100%)`; 
+            }
+        }
+
+        // Normal pills toggle
+        document.querySelectorAll('.pill:not(.mood-btn):not([id^="btn-toggle-"])').forEach(p => {
+            p.addEventListener('click', () => {
+                p.classList.toggle('active');
+                if(p.classList.contains('active')) {
+                    p.style.backgroundColor = 'var(--green)';
+                    p.style.borderColor = 'var(--green)';
+                    p.style.color = 'white';
+                } else {
+                    p.style.backgroundColor = 'var(--pill-bg)';
+                    p.style.borderColor = 'var(--border)';
+                    p.style.color = 'var(--pill-text)';
+                }
+            });
+        });
+
+        // Mood pills act as radio buttons
+        document.querySelectorAll('.mood-btn').forEach(p => {
+            p.addEventListener('click', () => {
+                document.querySelectorAll('.mood-btn').forEach(m => {
+                    m.classList.remove('active', 'mood-pill');
+                    m.style.backgroundColor = 'var(--pill-bg)';
+                    m.style.borderColor = 'var(--border)';
+                    m.style.color = 'var(--pill-text)';
+                });
+                p.classList.add('active', 'mood-pill');
+                p.style.backgroundColor = 'rgba(59,130,246,0.1)';
+                p.style.borderColor = 'var(--blue)';
+                p.style.color = 'var(--blue)';
+            });
+        });
+
+        let domState = { d1: true, d5: true, d6: true };
+        function toggleDomain(dId) {
+            domState[dId] = !domState[dId];
+            const btn = document.getElementById('btn-toggle-' + dId);
+            const content = document.getElementById('content-' + dId);
+            
+            if (!domState[dId]) {
+                btn.textContent = 'Ativar Domínio';
+                btn.style.backgroundColor = '#f1f5f9';
+                btn.style.color = '#94a3b8';
+                content.style.opacity = '0.3';
+                content.style.pointerEvents = 'none';
+            } else {
+                btn.textContent = 'Desativar Domínio';
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                content.style.opacity = '1';
+                content.style.pointerEvents = 'auto';
+            }
+        }
+
+        function getValuesStr() { 
+            let data = [];
+            data.push("Contexto Comercial:");
+            data.push(`- Mentorado(a)/Vendedor: ${document.getElementById('sel-mentorado').value || 'Não informado'}`);
+            data.push(`- Tipo: ${document.getElementById('sel-encontro').value || 'Não informado'}`);
+            data.push(`- Ticket Médio: ${document.getElementById('inp-sessao').value || 'N/A'}`);
+            
+            document.querySelectorAll('.domain-block').forEach(dom => {
+                if (dom.id === 'domain-1' && !domState.d1) return;
+                if (dom.id === 'domain-5' && !domState.d5) return;
+                if (dom.id === 'domain-6' && !domState.d6) return;
+
+                let title = dom.querySelector('h2').textContent;
+                data.push("\n## " + title);
+                dom.querySelectorAll('.slider-wrap').forEach(sw => {
+                    let name = sw.querySelector('.slider-name').textContent;
+                    let val = sw.querySelector('input').value;
+                    data.push(`- ${name}: ${val}/100`);
+                });
+                let obs = dom.querySelector('textarea');
+                if(obs && obs.value.trim()) {
+                    data.push(`- Observação: ${obs.value.trim()}`);
+                }
+            });
+
+            let gatilhos = Array.from(document.querySelectorAll('#gatilhos .pill.active')).map(p => p.textContent);
+            if(gatilhos.length > 0) data.push("\n## Sabotadores de Vendas (Gargalos): " + gatilhos.join(', '));
+
+            let geral = document.getElementById('notas-gerais').value;
+            if(geral.trim()) data.push("\n## Notas Gerais/Feedback: " + geral.trim());
+
+            let humor = document.querySelector('.mood-btn.active');
+            if(humor) data.push("## Nível de Prontidão (Perfil Atual): " + humor.textContent);
+
+            return data.join('\n');
+        }
+
+        async function salvarEAnalisar() {
+            const btn=document.getElementById('btn-analisar'), resultBox=document.getElementById('resultado'), resultText=document.getElementById('resultado-texto');
+            btn.disabled=true; btn.textContent='Salvando...';
+            
+            const indStr = getValuesStr();
+            const prompt = ''; // a análise com o Agente Mentóra é feita na Visão Geral (os textos de instrução ficam no servidor);
+            
+            await MentoraPonte.analisarESalvar({
+                tipo: 'vendas', titulo: 'Telemetria de Vendas & Negociação', indStr, prompt,
+                btn, resultBox, resultText, textoBotao: '🌐 Salvar & Gerar Diagnóstico com Agente Mentóra'
+            });
+        }
+
+        // Init ranges
+        document.querySelectorAll('input[type=range]').forEach(s => {
+            updateSlider(s.id, s.value, s.dataset.color);
+        });
+        
+        // Load mentees if function exists from main page
+        if(typeof getMentees === 'function') {
+            const ms = getMentees();
+            const sel = document.getElementById('sel-mentorado');
+            ms.forEach(m => {
+                { const o = document.createElement('option'); o.value = m.id; o.textContent = m.nome || 'Mentorado'; sel.appendChild(o); }
+            });
+        }
+    </script>
+    <script src="telemetria_ponte.js?v=20261003b"></script>
+
+<style id="tele-pdf-estilo">
+.btn-pdf-tele { background:#fff; color:#5B2DA3; border:1.5px solid #5B2DA3; border-radius:8px; padding:0.75rem 1.25rem; font-size:14px; font-weight:600; cursor:pointer; }
+.btn-pdf-tele:hover { background:#F5F3FF; }
+@media print {
+  .footer-actions, button, .btn-pdf-tele { display:none !important; }
+  body { background:#fff !important; }
+  .resultado-box:empty { display:none !important; }
+  * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+<script>
+// Baixar PDF da telemetria: abre a impressão do navegador (escolha "Salvar como PDF")
+function baixarPDFTelemetria() {
+  var tituloOrig = document.title;
+  var d = new Date();
+  var sel = document.querySelector('select');
+  var nome = sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
+  document.title = 'Mentora - ' + tituloOrig + (nome && !/selecion/i.test(nome) ? ' - ' + nome : '') + ' - ' + d.toLocaleDateString('pt-BR').replace(/\//g, '-');
+  var res = document.getElementById('resultado');
+  var estavaOculto = res && getComputedStyle(res).display === 'none' && (document.getElementById('resultado-texto') || {}).textContent;
+  if (estavaOculto) res.style.display = 'block';
+  setTimeout(function () { window.print(); document.title = tituloOrig; }, 100);
+}
+</script>
+</body>
+</html>

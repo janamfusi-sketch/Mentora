@@ -1,0 +1,127 @@
+MENTÓRA — PACOTE v6 COMPLETO (03/10/2026)
+Arraste a pasta inteira (ou o zip) na Netlify. Nada mudou no banco nesta etapa.
+
+1. PDF das telemetrias e ferramentas
+   - mentora_pdf.js ligado no index.html.
+   - Telemetrias: PDF compacto em uma coluna (resultado por domínio, análise, pontos de
+     atenção, PDI do Agente e PDI do mentor). Sem "Ver todas as respostas", botões ou campos.
+   - Botão "Incluir no PDF" (desligado por padrão) nas perguntas/ações para a próxima sessão:
+     telemetrias, respostas do Agente nas ferramentas e no ciclo (DISC e Talentos).
+   - Lembrete com 3 opções ao gerar o PDF: Incluir e gerar / Gerar sem esse campo / Cancelar.
+   - Ligado em Roda da Vida, SMART, SWOT, Talentos e DISC.
+2. Painel admin (dashboard.html): contas da administração (perfil ADMIN ou role admin) fora das listas de mentores.
+3. Cadastro de mentor: foto com ajuste; CRP e/ou psicanálise com os mesmos campos da Configuração;
+   tudo conferido antes de criar a conta; foto e comprovantes enviados logo após o cadastro.
+4. Ajuste da foto de perfil (mentora_foto.js, NOVO): arrastar, zoom, prévia redonda/quadrada.
+   Na Configuração da comunidade e no cadastro. A foto é salva quadrada, já enquadrada.
+5. Celular (mentora_mobile.js, NOVO + mentora_ajustes.css): menu do topo recolhido; menus da
+   Comunidade e do Mentor em gaveta com botão "Menu"; sem rolagem lateral; grades em uma coluna.
+6. Teste "Descubra seu perfil Mentor": uma pergunta por vez, barra de progresso, botão Voltar.
+7. Textos atualizados: Funcionalidades (landing) e "Conheça a Comunidade".
+
+v6c (03/10/2026, tarde)
+- Linha do tempo: mostra a análise real do Agente Mentóra de cada telemetria e o PDI do mentor.
+- Textos: cartões "Prontuário Online" (4 abas) e "Engajamento" explicados.
+- Celular: cards de Funcionalidades mais largos e do tamanho do texto; margens laterais menores.
+- Prontuário: cabeçalho do mentorado organizado em etiquetas, sem "--" e sem "Geral" repetido.
+- Agenda: calendário mensal com datas (já estava no pacote; versão do arquivo renovada para o navegador baixar de novo).
+
+v6d (04/10/2026)
+- Agenda: clicar no dia abre o formulário (data, início, término, mentorado, nome, observação).
+  Dia com compromisso mostra o sino com a quantidade; clicar no sino abre a lista do dia para alterar ou apagar.
+  Vários compromissos por dia. Post-its ao lado do calendário.
+- Lembretes: resumo do dia ao entrar, aviso 15 min antes e na hora (fica na tela até fechar);
+  notificação do navegador quando a aba está em segundo plano (se o mentor permitir).
+- Corrigido: "Não foi possível carregar seus dados" e post-it que não abria em conta nova (campo vazio no banco).
+
+v6e (04/10/2026)
+- Celular: cards de Funcionalidades todos do mesmo tamanho (textos longos resumidos).
+- Análise do Mentor: botões "Salvar" e "Aplicar Telemetria" inteiros no celular.
+- Cadastro do mentorado: novas queixas (Vendas, Comunicação, Transição de carreira, Traumas, Burnout, Outro)
+  e novas abordagens (Comportamental, Emocional, Vendas, Comunicação, Transição de Carreira, Outros).
+- Visão Geral: novo card "Análise do Mentor" (domínios do teste manual, percepções, anotações, plano);
+  a Nota do Agente passa a ler os registros manuais e o bloco de notas, e se atualiza ao abrir a
+  Visão Geral quando há registro novo do mentor.
+
+v6f (04/10/2026)
+- Visão Geral: "Análise do Mentor" agora é o painel completo, igual ao Histórico: métricas, mapa de maturidade
+  com radar, mapeamento dos domínios, marcadores, respostas do mentorado, bloco de notas, anotações e plano de ação.
+  Com mais de um registro, um seletor escolhe qual mostrar.
+- Corrigido: nomes dos domínios do registro manual saíam trocados (ex.: "Clareza de Expressão" no nicho Geral).
+
+v7 (05/10/2026)
+BANCO (JÁ APLICADO no Supabase em 05/10/2026 — não precisa rodar nada):
+- Novo bucket privado "dever-evidencias" (até 10 MB por arquivo: fotos, prints, PDF, planilhas, documentos).
+  O mentorado só envia para a pasta do próprio link (com cota); só a mentora responsável abre os arquivos.
+- dc_buscar_dever_de_casa devolve também a data em que a lista foi enviada (base das semanas e dos prazos).
+- dc_enviar_dever_de_casa aceita as listas de semanas, prazos e arquivos de cada tarefa.
+
+DEVER DE CASA (deverdecasa.html + dever_estrutura.js NOVO + clean_prontuario.js):
+- Cada tarefa aparece separada em: ação, "Como fazer", "O que enviar como comprovação" e prazo.
+- Tarefa que pede print/foto/planilha/relatório: botão para o mentorado enviar o arquivo.
+- Tarefa semanal ou de várias vezes por semana: lista 1ª semana, 2ª semana... (pelo prazo: 30 dias = 4 semanas),
+  cada uma com resposta/justificativa, envio de arquivo e "Concluída". Semana que já terminou sem marcar
+  exige justificativa antes de enviar.
+- Tarefa sensível (dinheiro, % do salário, R$, peso): o valor sai do texto e vira "valor combinado";
+  o mentorado informa o valor acertado com a mentora. Prazos curto (30), médio (60) e longo (90 dias),
+  cada um com motivo, comprovante e "Concluído". Concluir num prazo anula os seguintes; prazos anteriores
+  e prazos vencidos sem conclusão pedem justificativa. Nota explicativa na própria tarefa.
+- Painel do mentor: etiquetas mostram como cada tarefa foi lida; botão "Ajustar" corrige (semanal e nº de
+  semanas, pede comprovação, sensível). Respostas mostram semanas, prazos, valor e arquivos (botão abre o arquivo).
+
+COMUNIDADE x ÁREA DO MENTOR (mentora_mobile.js):
+- Ao abrir qualquer tela da Área do Mentor estando na Comunidade, a Comunidade some (e vice-versa),
+  no computador e no celular. A tela volta para o topo.
+
+v7b (05/10/2026) — ENGAJAMENTO REFEITO (engajamento.js NOVO; clean_prontuario.js e vip-logic.js ajustados)
+- Sessão = compromisso da Agenda do Mentor com o mentorado escolhido (ou Registro do Mentor).
+  Ferramentas e telemetrias aplicadas NÃO contam mais como sessão. Dias sem sessão não são sinal.
+- Na Agenda (lista do dia) e na aba Engajamento ("Sessões agendadas") o mentor marca cada sessão que já
+  passou: Realizada, Mentorado cancelou, Mentorado remarcou, Não compareceu, Cancelada por mim.
+- Frequência combinada por mentorado (aba Engajamento): automática pela Agenda (mínimo quinzenal),
+  semanal, quinzenal, mensal ou bimestral. Ela só define janelas e prazos de tolerância.
+- Índice de risco (0 a 100) só com: cancelamentos/remarcações/faltas (25), dever de casa sem resposta (20),
+  respostas incompletas (17), percepção do mentor nas sessões (12), demora para responder (10),
+  onboarding sem resposta (8), pontos de atenção da IA já gerados (8). Medidos pela frequência na janela.
+- Níveis: abaixo de 30 sem alerta · 30–49 amarelo · 50–69 laranja · 70+ vermelho.
+  Agravantes: "falou em parar" nos últimos 30 dias ou as 2 últimas sessões não aconteceram → no mínimo laranja.
+- Score = 100 − índice (trajetória e órbita usam o mesmo cálculo).
+- Barras do dever de casa: concluídas, feitas parcialmente, não feitas com justificativa, sem justificativa.
+- Os pesos de cada sinal ficam só no cálculo (não aparecem para o mentor).
+- PDCA muda por nível (ciclos de 30, 30, 21 e 14 dias) e pelas ações ligadas aos sinais reais.
+- Bloco de notas da sessão: "Percepção desta sessão" (desmotivado, falou em parar, dificuldade financeira,
+  sem tempo, resistência, distante, engajado, trouxe avanços). Salva junto com o Registro do Mentor.
+
+v7c (05/10/2026) — PESQUISA INTERNA DOS MENTORES (por rodadas)
+BANCO (JÁ APLICADO): tabelas Pesquisa_Campanhas (rodadas) e Pesquisa_Satisfacao (respostas) + funções
+mentora_pesquisa_status / _enviar (mentor) e mentora_pesquisa_admin / _admin_nova_rodada / _admin_encerrar /
+_admin_excluir / _admin_reenviar (só administração). Primeira rodada criada com as 10 perguntas, por 1 ano.
+- Cada mentor responde UMA vez por rodada, a partir de 15 dias depois do cadastro (novos cadastrados
+  recebem quando completam 15 dias). A rodada fica ativa por 6 meses ou 1 ano e depois para sozinha.
+- pesquisa_mentora.js: monta o formulário com as perguntas da rodada ativa. "Responder depois" adia 3 dias;
+  o item "Pesquisa Mentóra" fica no menu lateral (Conta) enquanto a pesquisa estiver pendente.
+- admin_pesquisa.js (aba "Pesquisa Interna" do dashboard): rodadas (ativa e anteriores), nova rodada com
+  editor de perguntas (nota 1–10, NPS 0–10, escolha única, múltipla com limite, aberta; obrigatória;
+  ordem), duração 6 meses ou 1 ano, opção de enviar também para quem respondeu rodadas anteriores,
+  encerrar rodada, excluir respostas, reenviar para um mentor ou para os selecionados, gráficos por
+  pergunta, busca e CSV.
+
+v7f (05/10/2026) — PRÓ BUSINESS LIBERADO NA HORA (só VIP e Premium)
+BANCO (JÁ APLICADO): coluna Usuarios.pro_origem; funções mentora_admin_liberar_pro e mentora_admin_remover_pro
+(só administração). Convites de Free foram encerrados; o convite pendente de Premium foi ativado.
+- Painel adm (dashboard.html, aba Pró Business): só para VIP e Premium com o plano em dia, sem desconto ou
+  com desconto (%) nas próximas mensalidades (VIP: sobre o valor do VIP, e ganha as funcionalidades
+  Premium + Pró; Premium: sobre o valor do Premium). Free não pode receber. Prévia dos valores só para a adm.
+  Remover: VIP volta ao VIP; Premium segue até o fim do período pago e renova pelo valor normal.
+- Mentor (index.html, Configurações): só "✓ Plano Pró Business ativo", sem valores. "Seu plano: Pró Business".
+  Qualquer pagamento de quem é Pró usa automaticamente o valor definido pela administração.
+
+v7g (05/10/2026) — PLANO EM ATRASO: LEMBRETE E BLOQUEIO
+BANCO (JÁ APLICADO): dias úteis (seg–sex, sem feriados nacionais, Carnaval, Sexta-feira Santa e Corpus Christi);
+mentora_cobranca_situacao; durante o atraso o plano continua valendo; pagamento em atraso renova a partir do
+vencimento; mentora_cobranca_voltar_free; robô robo_cobranca_atraso (todo dia, 9h de Brasília) +
+Edge Function cobranca-lembretes (e-mails pelo Resend; falhas viram aviso no painel adm).
+- Venceu e não pagou: acesso normal. 2 dias úteis depois: e-mail de lembrete + aviso no topo da Área do Mentor
+  e em Configurações. Mais 3 dias úteis: Área do Mentor bloqueada (tela com "Pagar agora" e "Prefiro voltar
+  para o plano Free") + e-mail. Pagou: libera sozinho. Plano cancelado não entra em atraso.
+- cobranca_mentor.js (NOVO, index.html).

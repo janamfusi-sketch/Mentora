@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+    <meta charset="UTF-8"><meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Onboarding Híbrido — Diagnóstico e Alinhamento</title>
+
+ <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><script src="vendor/supabase-js-2.117.2.umd.js"></script>
+
+ <style>:root {
+
+ --bg-gradient: linear-gradient(135deg, #0F0C1B 0%, #1A152E 50%, #0D0A18 100%);
+
+ --card-bg: rgba(255, 255, 255, 0.04);
+
+ --card-border: rgba(255, 255, 255, 0.08);
+
+ --card-hover-border: rgba(168, 85, 247, 0.4);
+
+ --primary-purple: #8B5CF6;
+
+ --primary-purple-hover: #7C3AED;
+
+ --accent-glow: rgba(139, 92, 246, 0.25);
+
+ --txt-title: #FFFFFF;
+
+ --txt-body: #CBD5E1;
+
+ --txt-muted: #94A3B8;
+
+ --input-bg: rgba(15, 12, 27, 0.6);
+
+ --input-border: rgba(255, 255, 255, 0.12);
+
+ --input-focus: #8B5CF6;
+
+ --success: #10B981;
+
+ }
+
+
+
+ * {
+
+ box-sizing: border-box;
+
+ margin: 0;
+
+ padding: 0;
+
+ font-family: 'Plus Jakarta Sans', sans-serif;
+
+ }
+
+
+
+ body {
+
+ background: var(--bg-gradient);
+
+ color: var(--txt-body);
+
+ min-height: 100vh;
+
+ display: flex;
+
+ flex-direction: column;
+
+ align-items: center;
+
+ justify-content: center;
+
+ padding: 24px 16px;
+
+ overflow-x: hidden;
+
+ }
+
+
+
+ /* Container Principal */
+
+ .ob-container {
+
+ width: 100%;
+
+ max-width: 780px;
+
+ background: rgba(26, 21, 46, 0.65);
+
+ backdrop-filter: blur(20px);
+
+ -webkit-backdrop-filter: blur(20px);
+
+ border: 1px solid var(--card-border);
+
+ border-radius: 28px;
+
+ padding: 40px 36px;
+
+ box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.1);
+
+ position: relative;
+
+ transition: all 0.4s ease;
+
+ }
+
+
+
+ @media (max-width: 640px) {
+
+ .ob-container {
+
+ padding: 28px 20px;
+
+ border-radius: 20px;
+
+ }
+
+ }
+
+
+
+ /* Progress Bar */
+
+ .ob-progress-wrapper {
+
+ width: 100%;
+
+ height: 6px;
+
+ background: rgba(255, 255, 255, 0.06);
+
+ border-radius: 10px;
+
+ margin-bottom: 32px;
+
+ overflow: hidden;
+
+ }
+
+ .ob-progress-bar {
+
+ height: 100%;
+
+ width: 0%;
+
+ background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 100%);
+
+ transition: width 0.4s ease;
+
+ border-radius: 10px;
+
+ }
+
+
+
+ /* Badge Header */
+
+ .ob-badge {
+
+ display: inline-flex;
+
+ align-items: center;
+
+ gap: 8px;
+
+ padding: 6px 16px;
+
+ background: rgba(139, 92, 246, 0.12);
+
+ border: 1px solid rgba(139, 92, 246, 0.3);
+
+ border-radius: 100px;
+
+ color: #D8B4FE;
+
+ font-size: 0.825rem;
+
+ font-weight: 600;
+
+ letter-spacing: 0.5px;
+
+ text-transform: uppercase;
+
+ margin-bottom: 20px;
+
+ }
+
+ .ob-badge::before {
+
+ content: '';
+
+ color: #A855F7;
+
+ }
+
+
+
+ /* Titles & Subtitles */
+
+ h1, h2 {
+
+ font-family: 'Outfit', sans-serif;
+
+ color: var(--txt-title);
+
+ line-height: 1.25;
+
+ }
+
+ .ob-title-large {
+
+ font-size: 2.2rem;
+
+ font-weight: 700;
+
+ margin-bottom: 16px;
+
+ background: linear-gradient(180deg, #FFFFFF 0%, #CBD5E1 100%);
+
+ -webkit-background-clip: text;
+
+ -webkit-text-fill-color: transparent;
+
+ }
+
+
+
+ /* Confidentiality Box */
+
+ .ob-confidential-box {
+
+ background: rgba(139, 92, 246, 0.06);
+
+ border-left: 4px solid var(--primary-purple);
+
+ border-radius: 12px;
+
+ padding: 20px 24px;
+
+ margin: 24px 0 36px 0;
+
+ font-size: 1.05rem;
+
+ line-height: 1.6;
+
+ color: #E2E8F0;
+
+ }
+
+
+
+ /* Questions & Options */
+
+ .ob-question-group {
+
+ margin-bottom: 36px;
+
+ padding-bottom: 32px;
+
+ border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+ }
+
+ .ob-question-group:last-child {
+
+ border-bottom: none;
+
+ margin-bottom: 0;
+
+ padding-bottom: 0;
+
+ }
+
+ .ob-question-label {
+
+ font-size: 1.05rem;
+
+ font-weight: 600;
+
+ color: #F8FAFC;
+
+ margin-bottom: 14px;
+
+ display: block;
+
+ line-height: 1.4;
+
+ }
+
+ .ob-question-subtext {
+
+ font-size: 0.875rem;
+
+ color: var(--txt-muted);
+
+ margin-top: -8px;
+
+ margin-bottom: 14px;
+
+ display: block;
+
+ }
+
+
+
+ /* Option Cards (Radio / Checkbox) */
+
+ .ob-options-grid {
+
+ display: flex;
+
+ flex-direction: column;
+
+ gap: 12px;
+
+ }
+
+ .ob-option-card {
+
+ display: flex;
+
+ align-items: flex-start;
+
+ gap: 14px;
+
+ padding: 16px 20px;
+
+ background: var(--card-bg);
+
+ border: 1px solid var(--card-border);
+
+ border-radius: 16px;
+
+ cursor: pointer;
+
+ transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+ user-select: none;
+
+ }
+
+ .ob-option-card:hover {
+
+ background: rgba(255, 255, 255, 0.07);
+
+ border-color: var(--card-hover-border);
+
+ transform: translateY(-1px);
+
+ }
+
+ .ob-option-card.selected {
+
+ background: rgba(139, 92, 246, 0.15);
+
+ border-color: var(--primary-purple);
+
+ box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+
+ }
+
+ .ob-option-card input[type="radio"],
+
+ .ob-option-card input[type="checkbox"] {
+
+ appearance: none;
+
+ -webkit-appearance: none;
+
+ width: 20px;
+
+ height: 20px;
+
+ border: 2px solid rgba(255, 255, 255, 0.3);
+
+ border-radius: 6px;
+
+ margin-top: 2px;
+
+ outline: none;
+
+ cursor: pointer;
+
+ display: grid;
+
+ place-content: center;
+
+ transition: all 0.2s ease;
+
+ flex-shrink: 0;
+
+ }
+
+ .ob-option-card input[type="radio"] {
+
+ border-radius: 50%;
+
+ }
+
+ .ob-option-card input[type="radio"]:checked,
+
+ .ob-option-card input[type="checkbox"]:checked {
+
+ background: var(--primary-purple);
+
+ border-color: var(--primary-purple);
+
+ }
+
+ .ob-option-card input[type="checkbox"]:checked::before {
+
+ content: "";
+
+ color: white;
+
+ font-size: 13px;
+
+ font-weight: bold;
+
+ }
+
+ .ob-option-card input[type="radio"]:checked::before {
+
+ content: "";
+
+ width: 8px;
+
+ height: 8px;
+
+ background: white;
+
+ border-radius: 50%;
+
+ }
+
+ .ob-option-text {
+
+ font-size: 0.975rem;
+
+ color: #E2E8F0;
+
+ line-height: 1.4;
+
+ }
+
+
+
+ /* Inputs & Textareas */
+
+ .ob-input, .ob-textarea {
+
+ width: 100%;
+
+ background: var(--input-bg);
+
+ border: 1px solid var(--input-border);
+
+ border-radius: 14px;
+
+ padding: 14px 18px;
+
+ color: #FFFFFF;
+
+ font-size: 0.95rem;
+
+ outline: none;
+
+ transition: all 0.2s ease;
+
+ }
+
+ .ob-input:focus, .ob-textarea:focus {
+
+ border-color: var(--input-focus);
+
+ box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+
+ }
+
+ .ob-input::placeholder, .ob-textarea::placeholder {
+
+ color: rgba(255, 255, 255, 0.3);
+
+ }
+
+ .ob-textarea {
+
+ min-height: 130px;
+
+ resize: vertical;
+
+ line-height: 1.6;
+
+ }
+
+
+
+ .ob-extra-input {
+
+ margin-top: 12px;
+
+ display: none;
+
+ }
+
+
+
+ /* Word Counter */
+
+ .ob-counter-bar {
+
+ display: flex;
+
+ justify-content: space-between;
+
+ align-items: center;
+
+ font-size: 0.8rem;
+
+ color: var(--txt-muted);
+
+ margin-top: 6px;
+
+ }
+
+ .ob-counter-bar.limit-reached {
+
+ color: #EF4444;
+
+ font-weight: 600;
+
+ }
+
+
+
+ /* Buttons */
+
+ .ob-btn:disabled { opacity: 0.6; cursor: wait; }
+ .ob-btn {
+
+ display: inline-flex;
+
+ align-items: center;
+
+ justify-content: center;
+
+ gap: 10px;
+
+ padding: 16px 32px;
+
+ background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+
+ color: #FFFFFF;
+
+ font-size: 1.05rem;
+
+ font-weight: 600;
+
+ border: none;
+
+ border-radius: 100px;
+
+ cursor: pointer;
+
+ transition: all 0.3s ease;
+
+ box-shadow: 0 8px 25px rgba(139, 92, 246, 0.35);
+
+ width: 100%;
+
+ }
+
+ .ob-btn:hover {
+
+ transform: translateY(-2px);
+
+ box-shadow: 0 12px 30px rgba(139, 92, 246, 0.5);
+
+ background: linear-gradient(135deg, #9D72FF 0%, #8B5CF6 100%);
+
+ }
+
+ .ob-btn-secondary {
+
+ background: rgba(255, 255, 255, 0.08);
+
+ border: 1px solid rgba(255, 255, 255, 0.15);
+
+ box-shadow: none;
+
+ }
+
+ .ob-btn-secondary:hover {
+
+ background: rgba(255, 255, 255, 0.15);
+
+ box-shadow: none;
+
+ }
+
+
+
+ /* Step Views */
+
+ .ob-step {
+
+ display: none;
+
+ animation: fadeIn 0.4s ease forwards;
+
+ }
+
+ .ob-step.active {
+
+ display: block;
+
+ }
+
+
+
+ @keyframes fadeIn {
+
+ from { opacity: 0; transform: translateY(12px); }
+
+ to { opacity: 1; transform: translateY(0); }
+
+ }
+
+
+
+ /* Success Icon */
+
+ .ob-success-badge {
+
+ width: 72px;
+
+ height: 72px;
+
+ background: rgba(16, 185, 129, 0.15);
+
+ border: 2px solid #10B981;
+
+ border-radius: 50%;
+
+ display: flex;
+
+ align-items: center;
+
+ justify-content: center;
+
+ font-size: 32px;
+
+ color: #10B981;
+
+ margin: 0 auto 24px auto;
+
+ }
+
+ 
+
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+
+
+
+<div class="ob-container"><!-- Progress Bar -->
+
+ <div class="ob-progress-wrapper"><div class="ob-progress-bar" id="obProgressBar"></div>
+
+ </div>
+
+
+
+ <!-- ETAPA 1: Boas-Vindas -->
+
+ <div class="ob-step active" id="step1"><div class="ob-badge">Onboarding Híbrido: Diagnóstico e Alinhamento</div>
+
+ <h1 class="ob-title-large">Bem-vindo(a) à sua jornada</h1>
+
+ 
+
+ <div class="ob-confidential-box">Este é o seu espaço seguro. As informações compartilhadas aqui são estritamente confidenciais e servirão para que a nossa mentoria seja cirúrgica e voltada para os seus desafios reais.
+
+ </div>
+
+
+
+ <button class="ob-btn" onclick="goToStep(2)">Começar meu diagnóstico 
+
+ </button>
+
+ </div>
+
+
+
+ <!-- ETAPA 2: Diagnóstico (Perguntas) -->
+
+ <div class="ob-step" id="step2"><div class="ob-badge">O Cenário Atual (Mapeamento de Contexto)</div>
+
+
+
+ <form id="onboardingForm" onsubmit="submitForm(event)">
+
+ <div id="dynamicQuestionsContainer">
+
+ <div style="text-align: center; padding: 40px; color: var(--txt-muted);">Carregando perguntas...</div>
+
+ </div>
+
+
+
+ <button type="submit" class="ob-btn" id="btnSubmitOnboarding" style="margin-top: 20px; display: none;">Concluir e Enviar Diagnóstico 
+
+ </button>
+
+ </form>
+
+ </div>
+
+
+
+ <!-- ETAPA 3: Conclusão -->
+
+ <div class="ob-step" id="step3"><div class="ob-success-badge"></div>
+
+ <h1 class="ob-title-large" style="text-align: center;">Diagnóstico Concluído!</h1>
+
+ 
+
+ <div class="ob-confidential-box" style="text-align: center; border-left: none; border-top: 4px solid var(--success);">Suas respostas já estão comigo e formam a base do nosso trabalho. Nosso próximo passo é a primeira sessão ao vivo, onde transformaremos esse mapa em um plano de ataque.
+
+ </div>
+
+ </div>
+
+
+
+ </div>
+
+
+
+ <script>
+ // Mentóra — Onboarding da mentorada
+ // Perguntas e respostas passam SOMENTE pelo Supabase, via funções seguras
+ // (ob_buscar_perguntas / ob_enviar_respostas). Nada fica só no navegador.
+ const supabaseUrl = (window.ENV && window.ENV.SUPABASE_URL) || 'https://duhaqygpyamjelwxylmn.supabase.co';
+ const supabaseKey = (window.ENV && window.ENV.SUPABASE_ANON_KEY) || 'sb_publishable_n2qLPXvOmwCZRHCcCziVlg_rWRiiDcB';
+
+ let supabaseClient = null;
+ try {
+ if (window.supabase) supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+ } catch (e) {
+ console.error('Falha ao iniciar o Supabase:', e);
+ }
+
+ // O id vem SOMENTE do link enviado pela mentora
+ const menteeId = (new URLSearchParams(window.location.search).get('id') || '').trim();
+ let loadedQuestions = [];
+
+ function goToStep(stepNum) {
+ document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('active'));
+ const target = document.getElementById('step' + stepNum);
+ if (target) target.classList.add('active');
+
+ const progressBar = document.getElementById('obProgressBar');
+ if (stepNum === 1) progressBar.style.width = '10%';
+ if (stepNum === 2) {
+ progressBar.style.width = '60%';
+ loadQuestions();
+ }
+ if (stepNum === 3) progressBar.style.width = '100%';
+
+ window.scrollTo({ top: 0, behavior: 'smooth' });
+ }
+
+ function normalizarPerguntas(raw) {
+ let q = raw;
+ if (typeof q === 'string') { try { q = JSON.parse(q); } catch (e) { return []; } }
+ if (q && !Array.isArray(q) && Array.isArray(q.questions)) q = q.questions;
+ if (!Array.isArray(q)) return [];
+ return q.map(x => typeof x === 'string' ? x : (x && (x.text || x.pergunta)) || '')
+ .map(x => String(x).trim()).filter(Boolean);
+ }
+
+ function mostrarAviso(titulo, texto) {
+ const container = document.getElementById('dynamicQuestionsContainer');
+ container.innerHTML = '';
+ const box = document.createElement('div');
+ box.style.cssText = 'text-align: center; padding: 40px; background: rgba(255,255,255,0.05); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.2);';
+ const t = document.createElement('div');
+ t.style.cssText = 'font-size: 1.1rem; font-weight: 600; color: #E2E8F0; margin-bottom: 8px;';
+ t.textContent = titulo;
+ const p = document.createElement('div');
+ p.style.cssText = 'color: var(--txt-muted); font-size: 0.9rem;';
+ p.textContent = texto;
+ box.appendChild(t);
+ box.appendChild(p);
+ container.appendChild(box);
+ document.getElementById('btnSubmitOnboarding').style.display = 'none';
+ }
+
+ async function loadQuestions() {
+ const container = document.getElementById('dynamicQuestionsContainer');
+ const btnSubmit = document.getElementById('btnSubmitOnboarding');
+
+ if (!menteeId) {
+ mostrarAviso('Este link está incompleto.', 'Peça à sua mentora para enviar o link do onboarding novamente.');
+ return;
+ }
+ if (!supabaseClient) {
+ mostrarAviso('Não foi possível conectar.', 'Verifique sua internet e recarregue a página.');
+ return;
+ }
+
+ const { data, error } = await supabaseClient.rpc('ob_buscar_perguntas', { p_mentorado_id: menteeId });
+ if (error) {
+ console.error('Erro ao buscar perguntas:', error);
+ mostrarAviso('Não foi possível carregar as perguntas agora.', 'Recarregue a página em alguns instantes.');
+ return;
+ }
+
+ loadedQuestions = data ? normalizarPerguntas(data.perguntas) : [];
+
+ if (loadedQuestions.length === 0) {
+ mostrarAviso('Ainda não há perguntas configuradas.', 'Aguarde sua mentora configurar o questionário ou entre em contato com ela.');
+ return;
+ }
+
+ container.innerHTML = '';
+ loadedQuestions.forEach((q, idx) => {
+ const group = document.createElement('div');
+ group.className = 'ob-question-group';
+ const label = document.createElement('label');
+ label.className = 'ob-question-label';
+ label.setAttribute('for', 'answer_' + idx);
+ label.textContent = (idx + 1) + '. ' + q;
+ const ta = document.createElement('textarea');
+ ta.id = 'answer_' + idx;
+ ta.className = 'ob-textarea';
+ ta.placeholder = 'Escreva sua resposta livremente...';
+ ta.required = true;
+ ta.setAttribute('aria-required', 'true');
+ group.appendChild(label);
+ group.appendChild(ta);
+ container.appendChild(group);
+ });
+
+ btnSubmit.style.display = 'inline-flex';
+ }
+
+ async function submitForm(e) {
+ e.preventDefault();
+ const btn = document.getElementById('btnSubmitOnboarding');
+ const textoOriginal = btn.textContent;
+
+ const respostas = loadedQuestions.map((q, idx) => {
+ const el = document.getElementById('answer_' + idx);
+ return { pergunta: q, resposta: el ? el.value.trim().slice(0, 5000) : '' };
+ });
+
+ btn.disabled = true;
+ btn.textContent = 'Enviando...';
+
+ const { error } = await supabaseClient.rpc('ob_enviar_respostas', {
+ p_mentorado_id: menteeId,
+ p_respostas: respostas
+ });
+
+ if (error) {
+ console.error('Erro ao enviar respostas:', error);
+ btn.disabled = false;
+ btn.textContent = textoOriginal;
+ alert('Suas respostas NÃO foram enviadas. Verifique sua internet e tente de novo. Nada do que você escreveu foi perdido.');
+ return;
+ }
+
+ goToStep(3);
+ }
+
+ function finishAction(action) {
+ alert('Diagnóstico enviado para a sua mentora com sucesso!\n\nSuas respostas foram recebidas e salvas de forma estritamente confidencial. Elas serão usadas para preparar a nossa primeira sessão ao vivo.');
+ }
+ </script>
+
+
+</body>
+
+
+</html>
+

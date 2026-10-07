@@ -1,0 +1,56 @@
+# =====================================================================
+# Mentóra — cabeçalhos de segurança e regras do servidor (Hostinger / Apache / LiteSpeed)
+# Este arquivo SÓ funciona quando o site estiver publicado no Hostinger. No seu computador ele não faz nada.
+# Pode deixar na pasta: não atrapalha.
+#
+# A política de conteúdo (CSP) abaixo está em modo SÓ-RELATÓRIO: ela NÃO bloqueia nada, só avisa no
+# console do navegador (F12 → Console, mensagens "[Report Only] Refused to ...") o que seria bloqueado.
+# Depois de publicar, navegue por TODAS as telas. Se não aparecer nenhum aviso, peça para trocar para o modo que bloqueia.
+# =====================================================================
+
+# Não listar o conteúdo das pastas
+Options -Indexes
+ServerSignature Off
+
+<IfModule mod_headers.c>
+  Header always unset X-Powered-By
+  Header always set X-Content-Type-Options "nosniff"
+  # As telemetrias abrem dentro da própria plataforma (mesmo site), por isso SAMEORIGIN
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # O site não usa câmera, microfone, localização, pagamento do navegador nem USB
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
+  # HSTS (obriga HTTPS). Começa com 1 dia; depois de uma semana sem problemas, troque 86400 por 31536000.
+  # Só ative DEPOIS de confirmar que o site abre em https:// sem aviso de segurança.
+  Header always set Strict-Transport-Security "max-age=86400"
+
+  # ---- CSP: MODO SÓ-RELATÓRIO (não bloqueia nada) ----
+  Header always set Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://duhaqygpyamjelwxylmn.supabase.co https://images.unsplash.com https://img.youtube.com https://api.qrserver.com; media-src 'self' blob: https://duhaqygpyamjelwxylmn.supabase.co https://*.b-cdn.net; connect-src 'self' https://duhaqygpyamjelwxylmn.supabase.co wss://duhaqygpyamjelwxylmn.supabase.co https://challenges.cloudflare.com; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://iframe.mediadelivery.net https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+
+  # ---- ENFORCE (bloqueia de verdade): quando o modo relatório não mostrar nenhum aviso, APAGUE a linha de cima
+  # ("Content-Security-Policy-Report-Only") e tire o "#" da linha abaixo. Cole nela o MESMO texto da política.
+  # Header always set Content-Security-Policy "COLE-AQUI-O-MESMO-TEXTO-DA-POLITICA"
+
+  # Bibliotecas hospedadas no site (pasta vendor/): nome tem a versão, então podem ficar em cache por 1 ano
+  <FilesMatch "(\.umd\.js|\.bundle\.min\.js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+# Arquivos que nunca devem ser públicos
+<IfModule mod_authz_core.c>
+  <FilesMatch "(?i)^(LEIA-ME\.txt|.*\.(sql|bak|log|ini|env|md|zip|tar|gz|map|sh|py))$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+  <FilesMatch "(?i)^(LEIA-ME\.txt|.*\.(sql|bak|log|ini|env|md|zip|tar|gz|map|sh|py))$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>
+
+# Compressão (deixa o site mais rápido)
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript text/javascript application/json image/svg+xml
+</IfModule>

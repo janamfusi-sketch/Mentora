@@ -1,0 +1,40 @@
+MENTÓRA — PACOTE COMPLETO DO SITE (02/10/2026, versão 4.1)
+
+COMO INSTALAR NO SEU COMPUTADOR (igual ao de sempre):
+1. Feche todas as abas do site e do painel.
+2. Na pasta do site ("Mentora com claude"), apague os arquivos .html e .js antigos
+   (inclusive o mentora-landing-page__1_2_SEGURA.html, que agora se chama index.html,
+   e os que tiverem "(1)", "(2)" no nome) e apague a pasta "vendor".
+3. Descompacte ESTE pacote dentro da pasta do site (se perguntar, escolha "substituir tudo").
+4. Abra o site e aperte Ctrl+F5 (e Ctrl+F5 de novo no painel administrativo).
+
+NOVO NA 4.1: o Asaas passa a cobrar SOMENTE no cartão de crédito (sem boleto e sem PIX do Asaas).
+  Mudaram só o index.html e o dashboard.html (os textos de pagamento). O PIX continua pelo "PIX direto".
+  Se você já instalou a versão 4 final, basta substituir esses dois arquivos.
+
+O QUE MUDOU NA VERSÃO 4 (correções de segurança da lista E):
+- Prontuário: textos do mentor e do mentorado nos detalhes de sessão nunca mais viram código.
+- Minha Metodologia: arquivos Word, impressão/PDF, exportação .doc, títulos e nichos filtrados.
+- 8 telemetrias: seletor de mentorado antigo trocado por versão segura.
+- Painel administrativo: "Ferramentas mais usadas" e "Ranking de mentores" agora mostram
+  dados REAIS dos últimos 30 dias (antes eram gráficos de exemplo vazios).
+No servidor (já publicado, você não precisa fazer nada): pagamento-webhook v5, buscador-noticias v18,
+limpeza-prints v1 (nova), permissões de tabela enxugadas e limpeza automática dos prints de suporte.
+
+O QUE TEM NESTE PACOTE:
+- O site (index.html: é a página inicial, já com o nome que o Hostinger exige), o painel (dashboard.html), todos os scripts .js
+  e as 8 telemetrias com a ponte.
+- As 2 páginas que o MENTORADO abre pelo link: onboarding.html e deverdecasa.html.
+- A pasta "vendor": 3 bibliotecas (Supabase, gráficos e PDF). NÃO apague.
+- O arquivo ".htaccess" (começa com ponto): só funciona no Hostinger. Se não aparecer na pasta,
+  ative "Itens ocultos" no Explorador de Arquivos.
+
+NÃO ESTÃO NESTE PACOTE (já estão na sua pasta, NÃO apague): imagens, logos e o clean_prontuario.css.
+
+QUANDO FOR PUBLICAR NO HOSTINGER: envie a pasta INTEIRA do site (com "vendor", ".htaccess",
+imagens, logos e o clean_prontuario.css), não só os arquivos deste pacote.
+NUNCA coloque na pasta do site a cópia de segurança dos cérebros nem os arquivos do servidor.
+
+POLÍTICA DE RETENÇÃO DO BACKUP MANUAL (backup_20260930, no Supabase):
+manter até o Supabase Pro estar ativo E os backups diários automáticos conferidos; só então apagar.
+Nunca apagar sem existir um backup mais novo. Ele está trancado: ninguém de fora acessa.

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telemetria de Traumas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { 
+            --purple: #5B2DA3; 
+            --blue: #3b82f6; 
+            --cyan: #06b6d4;
+            --indigo: #6366f1;
+            --green: #10b981;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --text: #1e293b; 
+            --text-muted: #64748B; 
+            --bg: #F8FAFC; 
+            --card: #ffffff; 
+            --border: #e2e8f0; 
+            --pill-bg: #f1f5f9;
+            --pill-text: #475569;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 4rem; }
+        
+        .header { padding: 2rem 0; margin-bottom: 1rem; }
+        .header h1 { font-family: 'Inter', sans-serif; font-size: 28px; margin-bottom: 0.5rem; color: #1e3a8a; font-weight: 700; }
+        .header h1 span { color: #1e3a8a; }
+        .header p { color: var(--text-muted); font-size: 14px; }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 1.5rem; }
+        
+        .card-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .fld { display: flex; flex-direction: column; gap: 0.5rem; }
+        .flbl { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .finp, .fsel { 
+            background: var(--bg); border: 1px solid var(--border); border-radius: 8px; 
+            padding: 0.75rem 1rem; color: var(--text); font-family: inherit; font-size: 14px; outline: none;
+        }
+        .finp:focus, .fsel:focus { border-color: var(--cyan); }
+
+        .domain-header { display: flex; gap: 1rem; margin-bottom: 1.5rem; margin-top: 1rem; }
+        .domain-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; flex-shrink: 0; }
+        .domain-info h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600; }
+        .domain-info h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+        .domain-info p { font-size: 13px; color: var(--text-muted); }
+
+        .sliders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .slider-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; }
+        .slider-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .slider-name { font-size: 13px; font-weight: 500; color: var(--text); }
+        .slider-value { font-size: 16px; font-weight: 700; color: var(--cyan); }
+        input[type=range] { width: 100%; -webkit-appearance: none; height: 4px; border-radius: 2px; outline: none; cursor: pointer; margin-bottom: 0.5rem; background: #E2E8F0; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--cyan); cursor: pointer; border: none; }
+        .scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); }
+
+        .od-obs {
+            width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            padding: 1rem; color: var(--text); font-family: inherit; font-size: 13px; min-height: 80px;
+            resize: vertical; outline: none; margin-bottom: 2rem;
+        }
+        .od-obs:focus { border-color: var(--cyan); }
+
+        .pills-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .pill {
+            background: var(--pill-bg); color: var(--pill-text); border: 1px solid var(--border);
+            padding: 0.4rem 0.8rem; border-radius: 100px; font-size: 12px; cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .pill.active { background: var(--cyan); color: white; border-color: var(--cyan); }
+        .pill.active.mood-pill { border-color: var(--green); color: var(--green); background: rgba(16,185,129,0.1); }
+
+        .footer-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+        .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-analisar { background: #38bdf8; color: white; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-analisar:hover { background: #0284c7; }
+        .btn-analisar:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .resultado-box { display: none; background: #f0fdfa; border: 1px solid #ccfbf1; border-radius: 8px; padding: 1.5rem; margin-top: 2rem; line-height: 1.6; font-size: 14px; color: #0f766e; }
+        
+        .salvar-btn { background: var(--orange); color: white; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="header container">
+        <h1>Telemetria de <span>Traumas</span></h1>
+        <p>Registre com que frequência cada padrão aparece no comportamento e nas falas do mentorado, segundo a sua observação na mentoria. É uma leitura de apoio ao desenvolvimento, não um diagnóstico.</p>
+    </div>
+
+    <div class="container">
+        
+        <!-- CONSENTIMENTO (LGPD) -->
+        <div class="card-box lgpd-box" id="lgpd-box">
+            <div class="section-header">CONSENTIMENTO DO MENTORADO (LGPD)</div>
+            <p class="lgpd-txt">As respostas desta telemetria podem revelar aspectos da saúde emocional do mentorado, que a LGPD trata como <b>dados pessoais sensíveis</b>. Antes de registrar, explique ao mentorado o que será anotado e para quê, e peça a autorização dele.</p>
+            <label class="lgpd-check"><input type="checkbox" id="lgpd-consentimento"> <span>Confirmo que o mentorado foi informado e autorizou, de forma específica e destacada, o registro destas percepções na Mentóra para uso exclusivo nesta mentoria, incluindo a análise com apoio de inteligência artificial. Ele pode revogar a autorização e pedir a exclusão dos dados a qualquer momento.</span></label>
+            <p class="lgpd-nota">Esta telemetria registra a sua percepção sobre comportamentos observados. Ela não é diagnóstico e não substitui psicólogo ou médico. A história de vida pode e deve ser explorada para entender os padrões, respeitando o ritmo e os limites do mentorado.</p>
+        </div>
+
+        <!-- CONTEXTO -->
+        <div class="card-box">
+            <div class="section-header">MENTORADO(A) & CONTEXTO</div>
+            <div class="form-row">
+                <div class="fld">
+                    <label class="flbl">MENTORADO(A)</label>
+                    <select class="fsel" id="sel-mentorado">
+                        <option value="">Selecione o mentorado(a)</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label class="flbl">DATA</label>
+                    <input class="finp" type="date" id="inp-data">
+                </div>
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+                <div class="fld">
+                    <label class="flbl">TIPO DE ENCONTRO</label>
+                    <select class="fsel" id="sel-encontro">
+                        <option value="">Selecione</option>
+                        <option>Sessão Individual</option>
+                        <option>Sessão de aprofundamento</option>
+                        <option>Sessão de acompanhamento</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label class="flbl">Nº DA SESSÃO</label>
+                    <input class="finp" type="text" placeholder="Ex: 3" id="inp-sessao">
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMÍNIOS -->
+        <div class="card-box">
+            <div class="section-header">ESCALA DE OBSERVAÇÃO DE PADRÕES (PERCEPÇÃO DO MENTOR)</div>
+            
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--cyan);">◈</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO I</h3>
+                        <h2>Reações sob Pressão</h2>
+                        <p>Como a pessoa reage quando se sente pressionada, cobrada ou insegura</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Fica em alerta, esperando que algo dê errado</span><span class="slider-value" id="val-hipervigilancia" style="color:var(--cyan);">50</span></div><input type="range" min="1" max="100" value="50" id="hipervigilancia" data-color="var(--cyan)" oninput="updateSlider('hipervigilancia', this.value, 'var(--cyan)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Se desliga quando o assunto aperta</span><span class="slider-value" id="val-dissociacao" style="color:var(--cyan);">50</span></div><input type="range" min="1" max="100" value="50" id="dissociacao" data-color="var(--cyan)" oninput="updateSlider('dissociacao', this.value, 'var(--cyan)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Trava diante de pressão ou cobrança</span><span class="slider-value" id="val-congelamento" style="color:var(--cyan);">50</span></div><input type="range" min="1" max="100" value="50" id="congelamento" data-color="var(--cyan)" oninput="updateSlider('congelamento', this.value, 'var(--cyan)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Adia ou evita situações difíceis</span><span class="slider-value" id="val-fuga" style="color:var(--cyan);">50</span></div><input type="range" min="1" max="100" value="50" id="fuga" data-color="var(--cyan)" oninput="updateSlider('fuga', this.value, 'var(--cyan)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Reage na defensiva ou com confronto</span><span class="slider-value" id="val-luta" style="color:var(--cyan);">50</span></div><input type="range" min="1" max="100" value="50" id="luta" data-color="var(--cyan)" oninput="updateSlider('luta', this.value, 'var(--cyan)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Reações maiores do que a situação pede</span><span class="slider-value" id="val-reatividade" style="color:var(--cyan);">50</span></div><input type="range" min="1" max="100" value="50" id="reatividade" data-color="var(--cyan)" oninput="updateSlider('reatividade', this.value, 'var(--cyan)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                </div>
+                <textarea class="od-obs" placeholder="Comportamentos, falas e passagens da história de vida que ajudam a entender este padrão (sem diagnósticos, medicamentos ou descrição detalhada de violência)."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--indigo);">◎</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO II</h3>
+                        <h2>Vínculos e Relações</h2>
+                        <p>Aproximação, confiança e insegurança nas relações</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Dificuldade em se aproximar das pessoas</span><span class="slider-value" id="val-evitacao_int" style="color:var(--indigo);">50</span></div><input type="range" min="1" max="100" value="50" id="evitacao_int" data-color="var(--indigo)" oninput="updateSlider('evitacao_int', this.value, 'var(--indigo)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Insegurança diante de distância ou silêncio</span><span class="slider-value" id="val-ansiedade_sep" style="color:var(--indigo);">50</span></div><input type="range" min="1" max="100" value="50" id="ansiedade_sep" data-color="var(--indigo)" oninput="updateSlider('ansiedade_sep', this.value, 'var(--indigo)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Medo de ser deixado de lado</span><span class="slider-value" id="val-medo_abandono" style="color:var(--indigo);">50</span></div><input type="range" min="1" max="100" value="50" id="medo_abandono" data-color="var(--indigo)" oninput="updateSlider('medo_abandono', this.value, 'var(--indigo)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Medo de rejeição</span><span class="slider-value" id="val-medo_rejeicao" style="color:var(--indigo);">50</span></div><input type="range" min="1" max="100" value="50" id="medo_rejeicao" data-color="var(--indigo)" oninput="updateSlider('medo_rejeicao', this.value, 'var(--indigo)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Necessidade de aprovação</span><span class="slider-value" id="val-nec_afirmacao" style="color:var(--indigo);">50</span></div><input type="range" min="1" max="100" value="50" id="nec_afirmacao" data-color="var(--indigo)" oninput="updateSlider('nec_afirmacao', this.value, 'var(--indigo)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Dificuldade em confiar</span><span class="slider-value" id="val-desconfianca" style="color:var(--indigo);">50</span></div><input type="range" min="1" max="100" value="50" id="desconfianca" data-color="var(--indigo)" oninput="updateSlider('desconfianca', this.value, 'var(--indigo)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                </div>
+                <textarea class="od-obs" placeholder="Comportamentos, falas e passagens da história de vida que ajudam a entender este padrão (sem diagnósticos, medicamentos ou descrição detalhada de violência)."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--green);">◇</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO III</h3>
+                        <h2>Autoimagem e Autovalor</h2>
+                        <p>Como a pessoa se vê e valoriza o que faz</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Sensação de não ser suficiente</span><span class="slider-value" id="val-inadequacao" style="color:var(--green);">50</span></div><input type="range" min="1" max="100" value="50" id="inadequacao" data-color="var(--green)" oninput="updateSlider('inadequacao', this.value, 'var(--green)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Desvaloriza as próprias conquistas</span><span class="slider-value" id="val-desvalorizacao" style="color:var(--green);">50</span></div><input type="range" min="1" max="100" value="50" id="desvalorizacao" data-color="var(--green)" oninput="updateSlider('desvalorizacao', this.value, 'var(--green)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Culpa excessiva</span><span class="slider-value" id="val-culpa" style="color:var(--green);">50</span></div><input type="range" min="1" max="100" value="50" id="culpa" data-color="var(--green)" oninput="updateSlider('culpa', this.value, 'var(--green)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Vergonha de se expor</span><span class="slider-value" id="val-vergonha_int" style="color:var(--green);">50</span></div><input type="range" min="1" max="100" value="50" id="vergonha_int" data-color="var(--green)" oninput="updateSlider('vergonha_int', this.value, 'var(--green)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Pouco entusiasmo com os próprios planos</span><span class="slider-value" id="val-vazio" style="color:var(--green);">50</span></div><input type="range" min="1" max="100" value="50" id="vazio" data-color="var(--green)" oninput="updateSlider('vazio', this.value, 'var(--green)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Dificuldade em receber reconhecimento e afeto</span><span class="slider-value" id="val-nao_amavel" style="color:var(--green);">50</span></div><input type="range" min="1" max="100" value="50" id="nao_amavel" data-color="var(--green)" oninput="updateSlider('nao_amavel', this.value, 'var(--green)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                </div>
+                <textarea class="od-obs" placeholder="Comportamentos, falas e passagens da história de vida que ajudam a entender este padrão (sem diagnósticos, medicamentos ou descrição detalhada de violência)."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--orange);">⊙</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO IV</h3>
+                        <h2>Estratégias de Proteção</h2>
+                        <p>O que a pessoa costuma fazer para se proteger do desconforto</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Racionaliza para não lidar com o que sente</span><span class="slider-value" id="val-racionalizacao" style="color:var(--orange);">50</span></div><input type="range" min="1" max="100" value="50" id="racionalizacao" data-color="var(--orange)" oninput="updateSlider('racionalizacao', this.value, 'var(--orange)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Autossabotagem</span><span class="slider-value" id="val-autossabotagem" style="color:var(--orange);">50</span></div><input type="range" min="1" max="100" value="50" id="autossabotagem" data-color="var(--orange)" oninput="updateSlider('autossabotagem', this.value, 'var(--orange)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Compensa com excesso de trabalho ou controle</span><span class="slider-value" id="val-compensatorios" style="color:var(--orange);">50</span></div><input type="range" min="1" max="100" value="50" id="compensatorios" data-color="var(--orange)" oninput="updateSlider('compensatorios', this.value, 'var(--orange)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Busca alívio em excessos</span><span class="slider-value" id="val-fuga_anestesia" style="color:var(--orange);">50</span></div><input type="range" min="1" max="100" value="50" id="fuga_anestesia" data-color="var(--orange)" oninput="updateSlider('fuga_anestesia', this.value, 'var(--orange)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Se isola quando não está bem</span><span class="slider-value" id="val-isolamento_prot" style="color:var(--orange);">50</span></div><input type="range" min="1" max="100" value="50" id="isolamento_prot" data-color="var(--orange)" oninput="updateSlider('isolamento_prot', this.value, 'var(--orange)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Atribui aos outros as próprias dificuldades</span><span class="slider-value" id="val-projecao" style="color:var(--orange);">50</span></div><input type="range" min="1" max="100" value="50" id="projecao" data-color="var(--orange)" oninput="updateSlider('projecao', this.value, 'var(--orange)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                </div>
+                <textarea class="od-obs" placeholder="Comportamentos, falas e passagens da história de vida que ajudam a entender este padrão (sem diagnósticos, medicamentos ou descrição detalhada de violência)."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--red);">⚡</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO V</h3>
+                        <h2>Identidade e Limites</h2>
+                        <p>Clareza sobre si, limites e vontades próprias</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Oscila muito na forma de se ver</span><span class="slider-value" id="val-fragmentacao" style="color:var(--red);">50</span></div><input type="range" min="1" max="100" value="50" id="fragmentacao" data-color="var(--red)" oninput="updateSlider('fragmentacao', this.value, 'var(--red)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Ignora sinais de cansaço e tensão</span><span class="slider-value" id="val-desconexao" style="color:var(--red);">50</span></div><input type="range" min="1" max="100" value="50" id="desconexao" data-color="var(--red)" oninput="updateSlider('desconexao', this.value, 'var(--red)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Dificuldade em impor limites</span><span class="slider-value" id="val-limites_pessoais" style="color:var(--red);">50</span></div><input type="range" min="1" max="100" value="50" id="limites_pessoais" data-color="var(--red)" oninput="updateSlider('limites_pessoais', this.value, 'var(--red)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Abre mão da própria vontade para agradar</span><span class="slider-value" id="val-fawning" style="color:var(--red);">50</span></div><input type="range" min="1" max="100" value="50" id="fawning" data-color="var(--red)" oninput="updateSlider('fawning', this.value, 'var(--red)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Sensação de ser uma fraude</span><span class="slider-value" id="val-fraude" style="color:var(--red);">50</span></div><input type="range" min="1" max="100" value="50" id="fraude" data-color="var(--red)" oninput="updateSlider('fraude', this.value, 'var(--red)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                    <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Pouca clareza sobre o próprio propósito</span><span class="slider-value" id="val-perda_proposito" style="color:var(--red);">50</span></div><input type="range" min="1" max="100" value="50" id="perda_proposito" data-color="var(--red)" oninput="updateSlider('perda_proposito', this.value, 'var(--red)')"><div class="scale-labels"><span>Raramente</span><span>Às vezes</span><span>Frequentemente</span></div></div>
+                </div>
+            </div>
+
+            <!-- GATILHOS E GARGALOS ADDED HERE TO MATCH LEADER -->
+            <div style="margin-bottom:2rem; margin-top:-1rem;">
+                <div class="flbl" style="margin-bottom:0.75rem;">GATILHOS IDENTIFICADOS NESTA SESSÃO (SELECIONE TODOS QUE SE APLICAM)</div>
+                <div class="pills-container" id="gatilhos">
+                    <div class="pill">Crítica / Rejeição</div><div class="pill">Conflito interpessoal</div><div class="pill">Falta de controle</div><div class="pill">Sentimento de insuficiência</div><div class="pill">Exposição / Visibilidade</div><div class="pill">Mudança de rotina</div><div class="pill">Feedback negativo</div><div class="pill">Comparação com pares</div><div class="pill">Erros e falhas</div><div class="pill">Sobrecarga emocional</div><div class="pill">Tensão no ambiente</div><div class="pill">Expectativas irreais</div><div class="pill">Medo de ser deixado de lado</div><div class="pill">Necessidade constante de afirmação</div>
+                </div>
+                <div class="flbl" style="margin-bottom:0.75rem; margin-top:1.5rem;">GARGALOS COMPORTAMENTAIS</div>
+                <div class="pills-container" id="gargalos">
+                    <div class="pill">Dificuldade em impor limites</div><div class="pill">Evitação de situações novas</div><div class="pill">Comunicação passiva</div><div class="pill">Isolamento social</div><div class="pill">Reatividade emocional</div><div class="pill">Autossabotagem</div><div class="pill">Tomada de decisão baseada no medo</div><div class="pill">Dependência de aprovação</div><div class="pill">Falta de autocuidado</div><div class="pill">Oscilações emocionais frequentes</div><div class="pill">Autoexigência extrema</div><div class="pill">Dificuldade em confiar</div><div class="pill">Medo de ser deixado de lado</div><div class="pill">Necessidade constante de afirmação</div>
+                </div>
+            </div>
+            <textarea class="od-obs" placeholder="Situações em que os gatilhos aparecem, hoje e na história do mentorado."></textarea>
+            
+        </div>
+
+        <!-- NOTAS FINAIS -->
+        <div class="card-box">
+            <div class="section-header">NOTAS GERAIS DA SESSÃO</div>
+            <textarea class="od-obs" id="notas-gerais" placeholder="Contexto da sessão, passagens da história de vida relevantes para a mentoria e pontos de atenção. Registre o necessário para o direcionamento; não registre diagnósticos, medicamentos, histórico médico nem descrição detalhada de violência." style="margin-bottom:1.5rem;"></textarea>
+            
+            <div class="flbl" style="margin-bottom:0.75rem;">NÍVEL DE PRONTIDÃO OBSERVADO NESTA SESSÃO</div>
+            <div class="pills-container" id="prontidao">
+                <div class="pill mood-btn">Alta energia</div>
+                <div class="pill mood-btn">Foco presente</div>
+                <div class="pill mood-btn">Resistente</div>
+                <div class="pill mood-btn">Sobrecarregado</div>
+                <div class="pill mood-btn">Defensivo</div>
+                <div class="pill mood-btn" id="pill-apoio">Precisa de apoio especializado</div>
+            </div>
+            <div class="apoio-aviso" id="apoio-aviso"><b>Mentoria não substitui atendimento em saúde mental.</b> Converse com cuidado e oriente o mentorado a procurar um psicólogo ou médico. Em situação de risco imediato: CVV 188 (24 horas, gratuito) ou SAMU 192.</div>
+        </div>
+
+        <div class="footer-actions">
+            <button class="btn-cancel" onclick="MentoraPonte.voltar()">Voltar para Visão Geral</button>
+            <button class="btn-analisar" id="btn-analisar" onclick="salvarEAnalisar()">Salvar e gerar análise</button>
+        </div>
+
+        <div class="resultado-box" id="resultado">
+            <div style="font-weight:700; margin-bottom:1rem; font-size:16px;">Análise com Agente Mentóra</div>
+            <div id="resultado-texto" style="white-space: pre-line;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const EDGE_URL = 'https://duhaqygpyamjelwxylmn.supabase.co/functions/v1/proxy-ia';
+        
+        document.getElementById('inp-data').valueAsDate = new Date();
+
+        function updateSlider(id, value, color) { 
+            const valEl = document.getElementById('val-'+id);
+            if(valEl) { valEl.textContent = value; valEl.style.color = color; }
+            const s = document.getElementById(id); 
+            if(s) {
+                const pct = value; 
+                s.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #E2E8F0 ${pct}%, #E2E8F0 100%)`; 
+            }
+        }
+
+        // Normal pills toggle
+        document.querySelectorAll('.pill:not(.mood-btn)').forEach(p => {
+            p.addEventListener('click', () => p.classList.toggle('active'));
+        });
+
+        // Mood pills act as radio buttons
+        document.querySelectorAll('.mood-btn').forEach(p => {
+            p.addEventListener('click', () => {
+                document.querySelectorAll('.mood-btn').forEach(m => m.classList.remove('active', 'mood-pill'));
+                p.classList.add('active', 'mood-pill');
+                const av = document.getElementById('apoio-aviso'); if (av) av.style.display = p.id === 'pill-apoio' ? 'block' : 'none';
+            });
+        });
+
+        function getValuesStr() { 
+            let data = [];
+            data.push("Contexto:");
+            data.push(`- Mentorado(a): ${document.getElementById('sel-mentorado').value || 'Não informado'}`);
+            data.push(`- Tipo: ${document.getElementById('sel-encontro').value || 'Não informado'}`);
+            data.push(`- Sessão: ${document.getElementById('inp-sessao').value || 'N/A'}`);
+            
+            document.querySelectorAll('.domain-block').forEach(dom => {
+                let title = dom.querySelector('h2').textContent;
+                data.push("\n## " + title);
+                dom.querySelectorAll('.slider-wrap').forEach(sw => {
+                    let name = sw.querySelector('.slider-name').textContent;
+                    let val = sw.querySelector('input').value;
+                    data.push(`- ${name}: ${val}/100`);
+                });
+                let obs = dom.querySelector('textarea');
+                if(obs && obs.value.trim()) {
+                    data.push(`- Observação: ${obs.value.trim()}`);
+                }
+            });
+
+            let gatilhos = Array.from(document.querySelectorAll('#gatilhos .pill.active')).map(p => p.textContent);
+            if(gatilhos.length > 0) data.push("\n## Gatilhos Identificados: " + gatilhos.join(', '));
+
+            let gargalos = Array.from(document.querySelectorAll('#gargalos .pill.active')).map(p => p.textContent);
+            if(gargalos.length > 0) data.push("## Gargalos Comportamentais: " + gargalos.join(', '));
+
+            let geral = document.getElementById('notas-gerais').value;
+            if(geral.trim()) data.push("\n## Notas Gerais: " + geral.trim());
+
+            let humor = document.querySelector('.mood-btn.active');
+            if(humor) data.push("## Nível de Prontidão: " + humor.textContent);
+
+            return data.join('\n');
+        }
+
+        async function salvarEAnalisar() {
+            const btn=document.getElementById('btn-analisar'), resultBox=document.getElementById('resultado'), resultText=document.getElementById('resultado-texto');
+            const ok = document.getElementById('lgpd-consentimento');
+            if (!ok || !ok.checked) {
+                alert('Antes de salvar, confirme o consentimento do mentorado (LGPD) no início da página.');
+                document.getElementById('lgpd-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            btn.disabled=true; btn.textContent='Salvando...';
+            
+            const indStr = getValuesStr();
+            const prompt = ''; // a análise com o Agente Mentóra é feita na Visão Geral
+            
+            await MentoraPonte.analisarESalvar({
+                tipo: 'trauma', titulo: 'Telemetria de Traumas', indStr, prompt,
+                dadosExtra: { consentimento: { confirmado: true, versao: 'traumas-v1-2026-10-01', forma: 'declaracao_do_mentor', registrado_em: new Date().toISOString() } },
+                btn, resultBox, resultText, textoBotao: '✨ Salvar & Gerar Análise com Agente Mentóra'
+            });
+        }
+
+        async function salvarResultado() {
+            const ok = document.getElementById('lgpd-consentimento');
+            if (!ok || !ok.checked) { alert('Antes de salvar, confirme o consentimento do mentorado (LGPD) no início da página.'); return; }
+            await MentoraPonte.salvarManual({
+                tipo: 'trauma', titulo: 'Telemetria de Traumas',
+                dadosExtra: { consentimento: { confirmado: true, versao: 'traumas-v1-2026-10-01', forma: 'declaracao_do_mentor', registrado_em: new Date().toISOString() } },
+                indStr: getValuesStr(),
+                analise: (document.getElementById('resultado-texto') || {}).textContent || ''
+            });
+        }
+
+        // Init ranges
+        document.querySelectorAll('input[type=range]').forEach(s => {
+            updateSlider(s.id, s.value, s.dataset.color);
+        });
+        
+        // Load mentees se vier de dashboard
+        if(typeof getMentees === 'function') {
+            const ms = getMentees();
+            const sel = document.getElementById('sel-mentorado');
+            ms.forEach(m => {
+                { const o = document.createElement('option'); o.value = m.id; o.textContent = m.nome || 'Mentorado'; sel.appendChild(o); }
+            });
+        }
+    </script>
+    <script src="telemetria_ponte.js?v=20261003b"></script>
+
+<style id="tele-pdf-estilo">
+.lgpd-box { border:1.5px solid #D9CCF5 !important; background:#FBF9FF !important; }
+.lgpd-txt { font-size:14px; color:#334155; line-height:1.6; margin:0 0 12px; }
+.lgpd-check { display:flex; gap:10px; align-items:flex-start; font-size:14px; color:#1B2559; line-height:1.55; cursor:pointer; background:#fff; border:1px solid #E4DDF7; border-radius:10px; padding:12px 14px; }
+.lgpd-check input { width:18px; height:18px; margin-top:2px; accent-color:#5B2DA3; flex-shrink:0; }
+.lgpd-nota { font-size:12.5px; color:#64748B; margin:10px 0 0; line-height:1.5; }
+.apoio-aviso { display:none; margin-top:12px; font-size:13.5px; line-height:1.55; color:#7C2D12; background:#FFF7ED; border:1px solid #FED7AA; border-radius:10px; padding:12px 14px; }
+.btn-pdf-tele { background:#fff; color:#5B2DA3; border:1.5px solid #5B2DA3; border-radius:8px; padding:0.75rem 1.25rem; font-size:14px; font-weight:600; cursor:pointer; }
+.btn-pdf-tele:hover { background:#F5F3FF; }
+@media print {
+  .footer-actions, button, .btn-pdf-tele { display:none !important; }
+  body { background:#fff !important; }
+  .resultado-box:empty { display:none !important; }
+  * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+<script>
+// Baixar PDF da telemetria: abre a impressão do navegador (escolha "Salvar como PDF")
+function baixarPDFTelemetria() {
+  var tituloOrig = document.title;
+  var d = new Date();
+  var sel = document.querySelector('select');
+  var nome = sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
+  document.title = 'Mentora - ' + tituloOrig + (nome && !/selecion/i.test(nome) ? ' - ' + nome : '') + ' - ' + d.toLocaleDateString('pt-BR').replace(/\//g, '-');
+  var res = document.getElementById('resultado');
+  var estavaOculto = res && getComputedStyle(res).display === 'none' && (document.getElementById('resultado-texto') || {}).textContent;
+  if (estavaOculto) res.style.display = 'block';
+  setTimeout(function () { window.print(); document.title = tituloOrig; }, 100);
+}
+</script>
+</body>
+</html>

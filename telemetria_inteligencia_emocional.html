@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Análise de Inteligência Emocional</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { 
+            --purple: #5B2DA3; 
+            --blue: #3b82f6; 
+            --cyan: #06b6d4;
+            --indigo: #6366f1;
+            --green: #10b981;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --text: #1e293b; 
+            --text-muted: #64748B; 
+            --bg: #F8FAFC; 
+            --card: #ffffff; 
+            --border: #e2e8f0; 
+            --pill-bg: #f1f5f9;
+            --pill-text: #475569;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 4rem; }
+        
+        .header { padding: 2rem 0; margin-bottom: 1rem; }
+        .header h1 { font-family: 'Inter', sans-serif; font-size: 28px; margin-bottom: 0.5rem; color: #1e3a8a; font-weight: 700; }
+        .header h1 span { color: #1e3a8a; }
+        .header p { color: var(--text-muted); font-size: 14px; }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 1.5rem; }
+        
+        .card-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .fld { display: flex; flex-direction: column; gap: 0.5rem; }
+        .flbl { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .finp, .fsel { 
+            background: var(--bg); border: 1px solid var(--border); border-radius: 8px; 
+            padding: 0.75rem 1rem; color: var(--text); font-family: inherit; font-size: 14px; outline: none;
+        }
+        .finp:focus, .fsel:focus { border-color: var(--indigo); }
+
+        .domain-header { display: flex; gap: 1rem; margin-bottom: 1.5rem; margin-top: 1rem; }
+        .domain-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; flex-shrink: 0; }
+        .domain-info h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600; }
+        .domain-info h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+        .domain-info p { font-size: 13px; color: var(--text-muted); }
+
+        .sliders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .slider-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; }
+        .slider-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .slider-name { font-size: 13px; font-weight: 500; color: var(--text); }
+        .slider-value { font-size: 16px; font-weight: 700; color: var(--cyan); }
+        input[type=range] { width: 100%; -webkit-appearance: none; height: 4px; border-radius: 2px; outline: none; cursor: pointer; margin-bottom: 0.5rem; background: #E2E8F0; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--cyan); cursor: pointer; border: none; }
+        .scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); }
+
+        .od-obs {
+            width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            padding: 1rem; color: var(--text); font-family: inherit; font-size: 13px; min-height: 80px;
+            resize: vertical; outline: none; margin-bottom: 2rem;
+        }
+        .od-obs:focus { border-color: var(--cyan); }
+
+        .pills-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .pill {
+            background: var(--pill-bg); color: var(--pill-text); border: 1px solid var(--border);
+            padding: 0.4rem 0.8rem; border-radius: 100px; font-size: 12px; cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .pill.active { background: var(--indigo); color: white; border-color: var(--indigo); }
+        .pill.active.mood-pill { border-color: var(--green); color: var(--green); background: rgba(16,185,129,0.1); }
+
+        .footer-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+        .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none;}
+        .btn-analisar { background: var(--indigo); color: white; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-analisar:hover { background: #4f46e5; }
+        .btn-analisar:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .resultado-box { display: none; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 1.5rem; margin-top: 2rem; line-height: 1.6; font-size: 14px; color: #3730a3; white-space: pre-line;}
+        .salvar-btn { background: #10b981; color: white; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 1rem; transition: all 0.2s; }
+        .salvar-btn:hover { background: #059669; }
+    </style>
+</head>
+<body>
+    <div class="header container">
+        <h1>Nova <span>Análise de Inteligência Emocional</span></h1>
+        <p>Avalie cada indicador com base nas observações do mentorado na sessão</p>
+    </div>
+
+    <div class="container">
+        
+        <!-- CONTEXTO -->
+        <div class="card-box">
+            <div class="section-header">MENTORADO(A) & CONTEXTO</div>
+            <div class="form-row">
+                <div class="fld">
+                    <label class="flbl">MENTORADO(A)</label>
+                    <select class="fsel" id="sel-mentorado">
+                        <option value="">Selecione o mentorado(a)</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label class="flbl">DATA</label>
+                    <input class="finp" type="date" id="inp-data">
+                </div>
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+                <div class="fld">
+                    <label class="flbl">TIPO DE ENCONTRO</label>
+                    <select class="fsel" id="sel-encontro">
+                        <option value="">Selecione</option>
+                        <option>Sessão Individual</option>
+                        <option>Sessão em Grupo</option>
+                        <option>Reunião de Feedback</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label class="flbl">Nº DA SESSÃO</label>
+                    <input class="finp" type="text" placeholder="Ex: 3" id="inp-sessao">
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMÍNIOS -->
+        <div class="domain-block">
+            <div class="domain-header">
+                <div class="domain-icon" style="background:var(--cyan);">◎</div>
+                <div class="domain-info">
+                    <h3>DOMÍNIO I</h3>
+                    <h2>Autoconsciência & Clareza</h2>
+                    <p>Mapeamento das emoções, gatilhos de energia e impacto no ambiente.</p>
+                </div>
+            </div>
+            <div class="sliders-grid">
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Autoconsciência emocional</span>
+                        <span class="slider-value" id="val-d1_auto" style="color:var(--cyan);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d1_auto" data-color="var(--cyan)" oninput="updateSlider('d1_auto', this.value, 'var(--cyan)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Identificação de gatilhos</span>
+                        <span class="slider-value" id="val-d1_gat" style="color:var(--cyan);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d1_gat" data-color="var(--cyan)" oninput="updateSlider('d1_gat', this.value, 'var(--cyan)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Mapeamento de drenos de energia</span>
+                        <span class="slider-value" id="val-d1_drenos" style="color:var(--cyan);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d1_drenos" data-color="var(--cyan)" oninput="updateSlider('d1_drenos', this.value, 'var(--cyan)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Percepção de impacto no clima</span>
+                        <span class="slider-value" id="val-d1_impacto" style="color:var(--cyan);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d1_impacto" data-color="var(--cyan)" oninput="updateSlider('d1_impacto', this.value, 'var(--cyan)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+            </div>
+            <textarea class="od-obs" placeholder="Observações sobre autoconsciência..."></textarea>
+        </div>
+
+        <div class="domain-block">
+            <div class="domain-header">
+                <div class="domain-icon" style="background:var(--indigo);">◈</div>
+                <div class="domain-info">
+                    <h3>DOMÍNIO II</h3>
+                    <h2>Autogestão & Resiliência</h2>
+                    <p>Capacidade de regulação emocional sob pressão e recuperação de falhas.</p>
+                </div>
+            </div>
+            <div class="sliders-grid">
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Regulação emocional</span>
+                        <span class="slider-value" id="val-d2_reg" style="color:var(--indigo);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d2_reg" data-color="var(--indigo)" oninput="updateSlider('d2_reg', this.value, 'var(--indigo)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Controle de impulsividade</span>
+                        <span class="slider-value" id="val-d2_imp" style="color:var(--indigo);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d2_imp" data-color="var(--indigo)" oninput="updateSlider('d2_imp', this.value, 'var(--indigo)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Receptividade a críticas</span>
+                        <span class="slider-value" id="val-d2_crit" style="color:var(--indigo);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d2_crit" data-color="var(--indigo)" oninput="updateSlider('d2_crit', this.value, 'var(--indigo)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Foco sob crise (Ansiedade)</span>
+                        <span class="slider-value" id="val-d2_foco" style="color:var(--indigo);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d2_foco" data-color="var(--indigo)" oninput="updateSlider('d2_foco', this.value, 'var(--indigo)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Tolerância à frustração</span>
+                        <span class="slider-value" id="val-d2_tol" style="color:var(--indigo);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d2_tol" data-color="var(--indigo)" oninput="updateSlider('d2_tol', this.value, 'var(--indigo)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Resiliência após falhas</span>
+                        <span class="slider-value" id="val-d2_res" style="color:var(--indigo);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d2_res" data-color="var(--indigo)" oninput="updateSlider('d2_res', this.value, 'var(--indigo)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+            </div>
+            <textarea class="od-obs" placeholder="Observações sobre autogestão e resiliência..."></textarea>
+        </div>
+
+        <div class="domain-block">
+            <div class="domain-header">
+                <div class="domain-icon" style="background:var(--green);">◇</div>
+                <div class="domain-info">
+                    <h3>DOMÍNIO III</h3>
+                    <h2>Empatia & Relacionamentos</h2>
+                    <p>Sensibilidade, escuta ativa e compreensão do time.</p>
+                </div>
+            </div>
+            <div class="sliders-grid">
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Empatia</span>
+                        <span class="slider-value" id="val-d3_emp" style="color:var(--green);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d3_emp" data-color="var(--green)" oninput="updateSlider('d3_emp', this.value, 'var(--green)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Leitura de ambiente (não-verbal)</span>
+                        <span class="slider-value" id="val-d3_leitura" style="color:var(--green);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d3_leitura" data-color="var(--green)" oninput="updateSlider('d3_leitura', this.value, 'var(--green)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Escuta ativa sob oposição</span>
+                        <span class="slider-value" id="val-d3_escuta" style="color:var(--green);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d3_escuta" data-color="var(--green)" oninput="updateSlider('d3_escuta', this.value, 'var(--green)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Compreensão empática</span>
+                        <span class="slider-value" id="val-d3_comp" style="color:var(--green);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d3_comp" data-color="var(--green)" oninput="updateSlider('d3_comp', this.value, 'var(--green)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+            </div>
+            <textarea class="od-obs" placeholder="Observações sobre empatia e leitura de ambiente..."></textarea>
+        </div>
+
+        <div class="domain-block">
+            <div class="domain-header">
+                <div class="domain-icon" style="background:var(--orange);">⊙</div>
+                <div class="domain-info">
+                    <h3>DOMÍNIO IV</h3>
+                    <h2>Habilidades Sociais & Influência</h2>
+                    <p>Gestão de conflitos, feedbacks difíceis e motivação.</p>
+                </div>
+            </div>
+            <div class="sliders-grid">
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Habilidades sociais</span>
+                        <span class="slider-value" id="val-d4_hab" style="color:var(--orange);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d4_hab" data-color="var(--orange)" oninput="updateSlider('d4_hab', this.value, 'var(--orange)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Mediação de conflitos</span>
+                        <span class="slider-value" id="val-d4_med" style="color:var(--orange);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d4_med" data-color="var(--orange)" oninput="updateSlider('d4_med', this.value, 'var(--orange)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Feedback construtivo</span>
+                        <span class="slider-value" id="val-d4_feed" style="color:var(--orange);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d4_feed" data-color="var(--orange)" oninput="updateSlider('d4_feed', this.value, 'var(--orange)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Referência em aconselhamento</span>
+                        <span class="slider-value" id="val-d4_ref" style="color:var(--orange);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d4_ref" data-color="var(--orange)" oninput="updateSlider('d4_ref', this.value, 'var(--orange)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-label">
+                        <span class="slider-name">Motivação intrínseca</span>
+                        <span class="slider-value" id="val-d4_mot" style="color:var(--orange);">50</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="50" id="d4_mot" data-color="var(--orange)" oninput="updateSlider('d4_mot', this.value, 'var(--orange)')">
+                    <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                </div>
+            </div>
+            <textarea class="od-obs" placeholder="Observações sobre habilidades sociais e mediação..."></textarea>
+        </div>
+
+        <!-- TAGS E COMPORTAMENTOS (PILLS) -->
+        <div class="card-box" id="gatilhos">
+            <div class="section-header">Gatilhos Emocionais Observados</div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:1rem;">O que parece desestabilizar o mentorado mais rapidamente:</p>
+            <div class="pills-container">
+                <div class="pill">Medo do julgamento</div>
+                <div class="pill">Críticas não construtivas</div>
+                <div class="pill">Sobrecarga de tarefas</div>
+                <div class="pill">Falta de controle</div>
+                <div class="pill">Conflitos diretos</div>
+                <div class="pill">Mudanças repentinas</div>
+                <div class="pill">Microgestão</div>
+                <div class="pill">Falta de reconhecimento</div>
+            </div>
+        </div>
+
+        <div class="card-box" id="gargalos">
+            <div class="section-header">Gargalos Comportamentais</div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:1rem;">O que trava o desempenho emocional e relacional:</p>
+            <div class="pills-container">
+                <div class="pill">Síndrome do impostor</div>
+                <div class="pill">Evitação de conflito</div>
+                <div class="pill">Perfeccionismo Bloqueador</div>
+                <div class="pill">Dificuldade em dizer não</div>
+                <div class="pill">Necessidade de aprovação</div>
+                <div class="pill">Reatividade alta</div>
+                <div class="pill">Ruminação de erros</div>
+                <div class="pill">Isolamento sob estresse</div>
+                <div class="pill">Autodesvalorização</div>
+                <div class="pill">Autossabotagem</div>
+                <div class="pill">Comparação Social Negativa</div>
+                <div class="pill">Baixíssima autoestima</div>
+                <div class="pill">Atribuição de Sucesso à Sorte</div>
+                <div class="pill">Dificuldade em Aceitar Elogios</div>
+            </div>
+        </div>
+
+        <!-- NOTAS GERAIS E PRONTIDÃO -->
+        <div class="card-box">
+            <div class="section-header">ESTADO DE HUMOR / PRONTIDÃO</div>
+            <div class="pills-container" style="margin-bottom:2rem;">
+                <div class="pill mood-btn">Engajado e Centrado</div>
+                <div class="pill mood-btn">Ansioso/Acelerado</div>
+                <div class="pill mood-btn">Desmotivado/Apático</div>
+                <div class="pill mood-btn">Sobrecarregado/Exausto</div>
+                <div class="pill mood-btn">Defensivo/Reativo</div>
+            </div>
+
+            <div class="section-header">ANOTAÇÕES GERAIS</div>
+            <textarea id="notas-gerais" class="od-obs" placeholder="Outras informações ou destaques do encontro..." style="margin-bottom:0;"></textarea>
+        </div>
+
+        <div class="footer-actions">
+            <a href="javascript:void(0)" onclick="MentoraPonte.voltar()" class="btn-cancel">Voltar para Visão Geral</a>
+            <button class="btn-analisar" id="btn-analisar" onclick="salvarEAnalisar()">Salvar e gerar análise</button>
+        </div>
+
+        <div class="resultado-box" id="resultado">
+            <div style="font-family:'Playfair Display',serif; font-size:18px; margin-bottom:1rem; font-weight:700;">📊 Análise com Agente Mentóra — Inteligência Emocional</div>
+            <div id="resultado-texto"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const EDGE_URL = 'https://duhaqygpyamjelwxylmn.supabase.co/functions/v1/proxy-ia';
+        
+        function updateSlider(id, value, color) {
+            const valEl = document.getElementById('val-'+id);
+            if(valEl) { valEl.textContent = value; valEl.style.color = color; }
+            const s = document.getElementById(id); 
+            if(s) {
+                const pct = value; 
+                s.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #E2E8F0 ${pct}%, #E2E8F0 100%)`; 
+            }
+        }
+
+        // Normal pills toggle
+        document.querySelectorAll('.pill:not(.mood-btn)').forEach(p => {
+            p.addEventListener('click', () => p.classList.toggle('active'));
+        });
+
+        // Mood pills act as radio buttons
+        document.querySelectorAll('.mood-btn').forEach(p => {
+            p.addEventListener('click', () => {
+                document.querySelectorAll('.mood-btn').forEach(m => m.classList.remove('active', 'mood-pill'));
+                p.classList.add('active', 'mood-pill');
+            });
+        });
+
+        function getValuesStr() {
+            let data = [];
+            data.push("Contexto:");
+            data.push(`- Mentorado(a): ${document.getElementById('sel-mentorado').value || 'Não informado'}`);
+            data.push(`- Tipo: ${document.getElementById('sel-encontro').value || 'Não informado'}`);
+            data.push(`- Sessão: ${document.getElementById('inp-sessao').value || 'N/A'}`);
+            
+            document.querySelectorAll('.domain-block').forEach(dom => {
+                let title = dom.querySelector('h2').textContent;
+                data.push("\n## " + title);
+                dom.querySelectorAll('.slider-wrap').forEach(sw => {
+                    let name = sw.querySelector('.slider-name').textContent;
+                    let val = sw.querySelector('input').value;
+                    data.push(`- ${name}: ${val}/100`);
+                });
+                let obs = dom.querySelector('textarea');
+                if(obs && obs.value.trim()) {
+                    data.push(`- Observação: ${obs.value.trim()}`);
+                }
+            });
+
+            let gatilhos = Array.from(document.querySelectorAll('#gatilhos .pill.active')).map(p => p.textContent);
+            if(gatilhos.length > 0) data.push("\n## Gatilhos Identificados: " + gatilhos.join(', '));
+
+            let gargalos = Array.from(document.querySelectorAll('#gargalos .pill.active')).map(p => p.textContent);
+            if(gargalos.length > 0) data.push("## Gargalos Comportamentais: " + gargalos.join(', '));
+
+            let geral = document.getElementById('notas-gerais').value;
+            if(geral.trim()) data.push("\n## Notas Gerais: " + geral.trim());
+
+            let humor = document.querySelector('.mood-btn.active');
+            if(humor) data.push("## Estado de Humor / Prontidão: " + humor.textContent);
+
+            return data.join('\n');
+        }
+
+        async function salvarEAnalisar() {
+            const btn = document.getElementById('btn-analisar');
+            const resultBox = document.getElementById('resultado');
+            const resultText = document.getElementById('resultado-texto');
+            btn.disabled = true; btn.textContent = 'Salvando...';
+            
+            const indStr = getValuesStr();
+            const prompt = ''; // a análise com o Agente Mentóra é feita na Visão Geral (os textos de instrução ficam no servidor);
+            
+            await MentoraPonte.analisarESalvar({
+                tipo: 'ie', titulo: 'Telemetria de Inteligência Emocional', indStr, prompt,
+                btn, resultBox, resultText, textoBotao: '⚡ Salvar & Gerar Análise com Agente Mentóra'
+            });
+        }
+
+        // Init ranges
+        document.querySelectorAll('input[type=range]').forEach(s => {
+            updateSlider(s.id, s.value, s.dataset.color);
+        });
+        
+        // Load mentees if function exists from main page
+        if(typeof getMentees === 'function') {
+            const ms = getMentees();
+            const sel = document.getElementById('sel-mentorado');
+            ms.forEach(m => {
+                { const o = document.createElement('option'); o.value = m.id; o.textContent = m.nome || 'Mentorado'; sel.appendChild(o); }
+            });
+        }
+
+        // Set default date
+        document.getElementById('inp-data').valueAsDate = new Date();
+    </script>
+    <script src="telemetria_ponte.js?v=20261003b"></script>
+
+<style id="tele-pdf-estilo">
+.btn-pdf-tele { background:#fff; color:#5B2DA3; border:1.5px solid #5B2DA3; border-radius:8px; padding:0.75rem 1.25rem; font-size:14px; font-weight:600; cursor:pointer; }
+.btn-pdf-tele:hover { background:#F5F3FF; }
+@media print {
+  .footer-actions, button, .btn-pdf-tele { display:none !important; }
+  body { background:#fff !important; }
+  .resultado-box:empty { display:none !important; }
+  * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+<script>
+// Baixar PDF da telemetria: abre a impressão do navegador (escolha "Salvar como PDF")
+function baixarPDFTelemetria() {
+  var tituloOrig = document.title;
+  var d = new Date();
+  var sel = document.querySelector('select');
+  var nome = sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
+  document.title = 'Mentora - ' + tituloOrig + (nome && !/selecion/i.test(nome) ? ' - ' + nome : '') + ' - ' + d.toLocaleDateString('pt-BR').replace(/\//g, '-');
+  var res = document.getElementById('resultado');
+  var estavaOculto = res && getComputedStyle(res).display === 'none' && (document.getElementById('resultado-texto') || {}).textContent;
+  if (estavaOculto) res.style.display = 'block';
+  setTimeout(function () { window.print(); document.title = tituloOrig; }, 100);
+}
+</script>
+</body>
+</html>

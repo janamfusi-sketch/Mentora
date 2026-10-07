@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Dever de Casa — Sua Mentoria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="vendor/supabase-js-2.117.2.umd.js"></script>
+<script src="dever_estrutura.js?v=20261005_v7"></script>
+<style>
+:root { --primary:#4F46E5; --primary-hover:#4338CA; --bg-gradient:linear-gradient(135deg,#F8FAFC 0%,#EFF6FF 100%); --card-bg:#FFFFFF; --text-main:#1E293B; --text-muted:#475569; --border-color:#E2E8F0; --success:#047857; --warn:#B45309; }
+* { box-sizing:border-box; margin:0; padding:0; font-family:'Plus Jakarta Sans', system-ui, sans-serif; }
+body { background:var(--bg-gradient); color:var(--text-main); min-height:100vh; display:flex; justify-content:center; align-items:flex-start; padding:24px 16px; }
+.dc-container { width:100%; max-width:720px; background:var(--card-bg); border-radius:20px; border:1px solid var(--border-color); box-shadow:0 10px 30px rgba(0,0,0,.04); padding:32px 28px; }
+.dc-badge { display:inline-block; font-size:11px; font-weight:700; letter-spacing:.5px; color:var(--primary); margin-bottom:8px; }
+.dc-title { font-size:1.25rem; font-weight:700; margin-bottom:6px; }
+.dc-subtitle { font-size:.875rem; color:var(--text-muted); line-height:1.5; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--border-color); }
+.dc-task-card { background:#F8FAFC; border:1px solid var(--border-color); border-radius:14px; padding:18px; margin-bottom:16px; }
+.dc-task-header { display:flex; align-items:flex-start; gap:12px; margin-bottom:8px; }
+.dc-task-title { font-size:.95rem; font-weight:700; line-height:1.4; flex:1; }
+.dc-detalhe { font-size:.84rem; color:var(--text-muted); line-height:1.5; margin-top:4px; }
+.dc-detalhe b { color:var(--text-main); font-weight:600; }
+.dc-valor-tag { background:#FFF7ED; color:#9A3412; border:1px solid #FED7AA; border-radius:6px; padding:0 6px; font-weight:600; white-space:nowrap; }
+.dc-chips { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 4px; }
+.dc-chip { font-size:.72rem; font-weight:600; padding:3px 9px; border-radius:100px; background:#fff; border:1px solid var(--border-color); color:var(--text-muted); }
+.dc-checkbox-label { display:inline-flex; align-items:center; gap:8px; font-size:.825rem; font-weight:600; color:var(--primary); cursor:pointer; user-select:none; background:#fff; padding:6px 12px; border-radius:20px; border:1px solid var(--border-color); white-space:nowrap; flex-shrink:0; }
+.dc-checkbox-label:hover { border-color:var(--primary); }
+.dc-checkbox-label input { width:16px; height:16px; accent-color:var(--primary); cursor:pointer; }
+.dc-checkbox-label.ok { background:#ECFDF5; border-color:#A7F3D0; color:var(--success); }
+.dc-label { font-size:.75rem; font-weight:600; color:var(--text-muted); margin:10px 0 4px; display:block; }
+.dc-textarea, .dc-input { width:100%; border:1px solid #CBD5E1; border-radius:8px; padding:10px 12px; font-size:.86rem; color:var(--text-main); background:#fff; outline:none; }
+.dc-textarea { min-height:60px; resize:vertical; }
+.dc-textarea:focus, .dc-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(79,70,229,.12); }
+.dc-erro { border-color:#DC2626 !important; box-shadow:0 0 0 3px rgba(220,38,38,.12) !important; }
+.dc-sub { margin-top:12px; display:flex; flex-direction:column; gap:10px; }
+.dc-sub-titulo { font-size:.8rem; font-weight:700; color:var(--text-main); margin-top:14px; }
+.dc-unidade { background:#fff; border:1px solid var(--border-color); border-radius:10px; padding:12px 14px; transition:opacity .2s; }
+.dc-unidade.feita { border-color:#A7F3D0; }
+.dc-unidade.anulada { opacity:.5; }
+.dc-unidade-cab { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+.dc-unidade-nome { font-size:.86rem; font-weight:700; }
+.dc-unidade-data { font-size:.76rem; color:var(--text-muted); font-weight:500; }
+.dc-anulado-msg { font-size:.78rem; color:var(--text-muted); margin-top:6px; display:none; }
+.dc-unidade.anulada .dc-anulado-msg { display:block; }
+.dc-unidade.anulada .dc-corpo { display:none; }
+.dc-upload { margin-top:8px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.dc-btn-arq { background:#EEF2FF; color:var(--primary-hover); border:1px dashed #A5B4FC; border-radius:8px; padding:7px 12px; font-size:.8rem; font-weight:600; cursor:pointer; }
+.dc-btn-arq:hover { background:#E0E7FF; }
+.dc-btn-arq:disabled { opacity:.6; cursor:wait; }
+.dc-arq { display:inline-flex; align-items:center; gap:6px; font-size:.76rem; background:#F0FDF4; color:var(--success); border:1px solid #A7F3D0; border-radius:100px; padding:3px 6px 3px 10px; max-width:100%; }
+.dc-arq span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:220px; }
+.dc-arq button { background:none; border:none; color:#64748B; cursor:pointer; font-size:.9rem; line-height:1; padding:0 4px; }
+.dc-nota { background:#F8FAFF; border:1px solid #E0E7FF; border-radius:10px; padding:10px 12px; font-size:.78rem; color:#3730A3; line-height:1.5; margin-top:12px; }
+.dc-nota b { font-weight:700; }
+.dc-btn { width:100%; background:linear-gradient(135deg,#4F46E5,#6366F1); color:#fff; border:none; padding:14px 24px; border-radius:100px; font-size:.95rem; font-weight:700; cursor:pointer; margin-top:16px; box-shadow:0 4px 15px rgba(79,70,229,.25); }
+.dc-btn:disabled { opacity:.6; cursor:wait; }
+.dc-empty { text-align:center; padding:30px 16px; color:var(--text-muted); font-size:.9rem; }
+.dc-success-card { text-align:center; padding:20px 10px; }
+.dc-success-title { font-size:1.15rem; font-weight:700; margin-bottom:8px; }
+@media (max-width:560px) { .dc-container { padding:22px 16px; border-radius:16px; } .dc-task-card { padding:14px; } .dc-task-header { flex-direction:column; } }
+</style>
+</head>
+<body><div class="dc-container"><div id="dc-content"><span class="dc-badge">Dever de casa · alinhamento da sessão</span>
+<h1 class="dc-title">Checklist de tarefas práticas</h1>
+<p class="dc-subtitle">Marque o que concluiu, envie a comprovação pedida (foto, print, PDF ou planilha) e, se não conseguiu, conte o motivo. Tudo chega direto para a sua mentora.</p>
+<div id="dc-tasks-list"><div class="dc-empty">Carregando tarefas do seu dever de casa...</div></div>
+<button id="dc-submit-btn" class="dc-btn" onclick="submitHomework()" style="display:none;">Enviar para a mentora</button>
+</div></div>
+
+<script>
+// Mentóra — Dever de Casa da mentorada (v7)
+// Lido e gravado no Supabase pelas funções seguras dc_buscar_dever_de_casa / dc_enviar_dever_de_casa.
+// Arquivos de comprovação vão para o bucket privado "dever-evidencias" (só a mentora responsável abre).
+const supabaseUrl = 'https://duhaqygpyamjelwxylmn.supabase.co';
+const supabaseKey = 'sb_publishable_n2qLPXvOmwCZRHCcCziVlg_rWRiiDcB';
+let supabaseClient = null;
+try { if (window.supabase) supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey); } catch (e) { console.error('Falha ao iniciar o Supabase:', e); }
+
+const menteeId = (new URLSearchParams(window.location.search).get('id') || '').trim();
+const D = window.DeverEstrutura;
+const MAX_ARQ_MB = 10, MAX_ARQ_POR_ITEM = 3;
+const TIPOS_EXT = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif', heic: 'image/heic', heif: 'image/heif', pdf: 'application/pdf', txt: 'text/plain', csv: 'text/csv', xls: 'application/vnd.ms-excel', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', ods: 'application/vnd.oasis.opendocument.spreadsheet', doc: 'application/msword', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', odt: 'application/vnd.oasis.opendocument.text' };
+const ACCEPT = 'image/*,.pdf,.xls,.xlsx,.csv,.ods,.doc,.docx,.odt,.txt';
+
+let currentTasks = [];   // [{ texto, info }]
+let arquivos = {};       // arquivos[taskIndex] = [{slot, path, nome, tipo, tam}]
+let baseData = new Date();
+
+function normalizarTarefas(raw) {
+  let t = raw;
+  if (typeof t === 'string') { try { t = JSON.parse(t); } catch (e) { return []; } }
+  if (t && !Array.isArray(t) && Array.isArray(t.tasks)) t = t.tasks;
+  if (!Array.isArray(t)) return [];
+  return t.map(item => (typeof item === 'string' ? item : (item && (item.text || item.titulo || item.taskText)) || '')).map(s => String(s).trim()).filter(Boolean);
+}
+function ajustesDe(raw) {
+  let t = raw;
+  if (typeof t === 'string') { try { t = JSON.parse(t); } catch (e) { return {}; } }
+  return (t && !Array.isArray(t) && t.ajustes && typeof t.ajustes === 'object') ? t.ajustes : {};
+}
+function mostrarMensagem(texto) {
+  const list = document.getElementById('dc-tasks-list');
+  list.innerHTML = ''; const div = document.createElement('div'); div.className = 'dc-empty'; div.textContent = texto; list.appendChild(div);
+  document.getElementById('dc-submit-btn').style.display = 'none';
+}
+function el(tag, cls, txt) { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+
+// Texto com "[valor combinado]" destacado
+function textoComValor(alvo, texto) {
+  String(texto).split('[valor combinado]').forEach((parte, i) => {
+    if (i > 0) alvo.appendChild(el('span', 'dc-valor-tag', 'valor combinado'));
+    alvo.appendChild(document.createTextNode(parte));
+  });
+}
+
+function checkbox(id, rotulo, marcado, aoMudar) {
+  const label = el('label', 'dc-checkbox-label' + (marcado ? ' ok' : ''));
+  const chk = document.createElement('input'); chk.type = 'checkbox'; chk.id = id; chk.checked = !!marcado;
+  chk.addEventListener('change', () => { label.classList.toggle('ok', chk.checked); if (aoMudar) aoMudar(chk.checked); });
+  label.appendChild(chk); label.appendChild(document.createTextNode(rotulo));
+  return label;
+}
+function areaTexto(id, rotulo, placeholder, valor) {
+  const frag = document.createDocumentFragment();
+  const l = el('label', 'dc-label', rotulo); l.setAttribute('for', id); frag.appendChild(l);
+  const t = el('textarea', 'dc-textarea'); t.id = id; t.placeholder = placeholder; t.value = valor || '';
+  t.addEventListener('input', () => t.classList.remove('dc-erro'));
+  frag.appendChild(t); return frag;
+}
+
+// ── Envio de arquivos (foto, print, PDF, planilha, documento) ──
+function blocoUpload(taskIndex, slot, rotuloBotao) {
+  const wrap = el('div', 'dc-upload'); wrap.dataset.slot = slot;
+  const input = document.createElement('input'); input.type = 'file'; input.accept = ACCEPT; input.multiple = true; input.style.display = 'none';
+  const btn = el('button', 'dc-btn-arq', rotuloBotao || 'Enviar arquivo'); btn.type = 'button';
+  btn.addEventListener('click', () => input.click());
+  input.addEventListener('change', async () => {
+    const files = Array.from(input.files || []); input.value = '';
+    for (const f of files) await enviarArquivo(taskIndex, slot, f, btn);
+    desenharArquivos(wrap, taskIndex, slot);
+  });
+  wrap.appendChild(btn); wrap.appendChild(input);
+  setTimeout(() => desenharArquivos(wrap, taskIndex, slot), 0);
+  return wrap;
+}
+function desenharArquivos(wrap, taskIndex, slot) {
+  wrap.querySelectorAll('.dc-arq').forEach(n => n.remove());
+  (arquivos[taskIndex] || []).filter(a => a.slot === slot).forEach(a => {
+    const chip = el('span', 'dc-arq'); chip.appendChild(el('span', null, '✓ ' + a.nome));
+    const x = el('button', null, '×'); x.type = 'button'; x.title = 'Tirar este arquivo da resposta';
+    x.addEventListener('click', () => { arquivos[taskIndex] = (arquivos[taskIndex] || []).filter(b => b !== a); desenharArquivos(wrap, taskIndex, slot); });
+    chip.appendChild(x); wrap.appendChild(chip);
+  });
+}
+async function enviarArquivo(taskIndex, slot, file, btn) {
+  const lista = arquivos[taskIndex] = arquivos[taskIndex] || [];
+  if (lista.filter(a => a.slot === slot).length >= MAX_ARQ_POR_ITEM) { alert(`Você pode enviar até ${MAX_ARQ_POR_ITEM} arquivos em cada item.`); return; }
+  if (file.size > MAX_ARQ_MB * 1024 * 1024) { alert(`"${file.name}" tem mais de ${MAX_ARQ_MB} MB. Envie um arquivo menor (ou um print da tela).`); return; }
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  const tipo = file.type || TIPOS_EXT[ext] || '';
+  if (!tipo || !Object.values(TIPOS_EXT).includes(tipo) && !/^image\//.test(tipo)) { alert(`"${file.name}" não é um formato aceito. Envie foto, print, PDF, planilha ou documento.`); return; }
+  const extSegura = /^[a-z0-9]{2,5}$/.test(ext) ? ext : 'bin';
+  const path = `${menteeId}/${Date.now()}-${taskIndex}-${slot}-${Math.random().toString(36).slice(2, 8)}.${extSegura}`;
+  const textoBtn = btn.textContent; btn.disabled = true; btn.textContent = 'Enviando arquivo...';
+  try {
+    const { error } = await supabaseClient.storage.from(D.BUCKET).upload(path, file, { contentType: tipo, upsert: false });
+    if (error) throw error;
+    lista.push({ slot, path, nome: file.name.slice(0, 120), tipo, tam: file.size });
+  } catch (e) {
+    console.error('Erro ao enviar arquivo:', e);
+    alert(`Não foi possível enviar "${file.name}". Verifique sua internet e tente de novo.\n\nDetalhe: ${(e && e.message) || e}`);
+  } finally { btn.disabled = false; btn.textContent = textoBtn; }
+}
+
+// ── Montagem de cada tarefa ──
+function montarCard(tarefa, index, prev) {
+  const info = tarefa.info;
+  const card = el('div', 'dc-task-card'); card.id = 'dc-card-' + index;
+  const header = el('div', 'dc-task-header');
+  const tituloBox = el('div'); tituloBox.style.flex = '1';
+  const titulo = el('div', 'dc-task-title'); titulo.appendChild(document.createTextNode((index + 1) + '. ')); textoComValor(titulo, info.acao);
+  tituloBox.appendChild(titulo);
+  if (info.como) { const d = el('div', 'dc-detalhe'); d.appendChild(el('b', null, 'Como fazer: ')); textoComValor(d, info.como); tituloBox.appendChild(d); }
+  if (info.evidenciaTexto) { const d = el('div', 'dc-detalhe'); d.appendChild(el('b', null, 'O que enviar como comprovação: ')); textoComValor(d, info.evidenciaTexto); tituloBox.appendChild(d); }
+  header.appendChild(tituloBox);
+
+  const simples = !info.semanal && !info.sensivel;
+  if (simples) header.appendChild(checkbox('dc-chk-' + index, 'Concluída', prev.completed));
+  card.appendChild(header);
+
+  const chips = el('div', 'dc-chips');
+  if (info.semanal) chips.appendChild(el('span', 'dc-chip', `Acompanhamento semanal · ${info.semanas} semanas`));
+  else if (!info.sensivel) chips.appendChild(el('span', 'dc-chip', `Prazo: ${info.prazoDias} dias${baseData ? ' · até ' + D.fmtAno(D.addDias(baseData, info.prazoDias)) : ''}`));
+  if (info.sensivel) chips.appendChild(el('span', 'dc-chip', 'Prazos: curto, médio e longo'));
+  if (info.evidencia) chips.appendChild(el('span', 'dc-chip', 'Pede comprovação'));
+  card.appendChild(chips);
+
+  // Valor combinado (tarefas sensíveis)
+  if (info.sensivel) {
+    const l = el('label', 'dc-label', 'Valor que você combinou com a sua mentora'); l.setAttribute('for', 'dc-valor-' + index); card.appendChild(l);
+    const inp = el('input', 'dc-input'); inp.id = 'dc-valor-' + index; inp.maxLength = 120; inp.value = prev.valor || '';
+    inp.placeholder = 'Ex.: R$ 150 por mês, 5% do salário...'; inp.addEventListener('input', () => inp.classList.remove('dc-erro'));
+    card.appendChild(inp);
+  }
+
+  // Lista semanal
+  if (info.semanal) {
+    card.appendChild(el('div', 'dc-sub-titulo', 'Registro por semana'));
+    const sub = el('div', 'dc-sub');
+    const prevSem = Array.isArray(prev.semanas) ? prev.semanas : [];
+    for (let n = 1; n <= info.semanas; n++) {
+      const ps = prevSem.find(s => Number(s.n) === n) || {};
+      const per = D.semanaPeriodo(baseData, n);
+      const u = el('div', 'dc-unidade' + (ps.ok ? ' feita' : '')); u.id = `dc-sem-${index}-${n}`;
+      const cab = el('div', 'dc-unidade-cab');
+      const nome = el('div'); nome.appendChild(el('div', 'dc-unidade-nome', `${n}ª semana`)); nome.appendChild(el('div', 'dc-unidade-data', `${D.fmt(per.ini)} a ${D.fmt(per.fim)}`));
+      cab.appendChild(nome); cab.appendChild(checkbox(`dc-sem-chk-${index}-${n}`, 'Concluída', ps.ok, v => u.classList.toggle('feita', v)));
+      u.appendChild(cab);
+      u.appendChild(areaTexto(`dc-sem-txt-${index}-${n}`, 'Resposta / justificativa', 'Conte o que fez nesta semana ou, se não conseguiu, o motivo...', ps.txt));
+      u.appendChild(blocoUpload(index, 's' + n, info.evidencia ? 'Enviar comprovação da semana' : 'Enviar arquivo'));
+      sub.appendChild(u);
+    }
+    card.appendChild(sub);
+  }
+
+  // Prazos curto / médio / longo (tarefas sensíveis)
+  if (info.sensivel) {
+    card.appendChild(el('div', 'dc-sub-titulo', 'Prazos para atingir a meta'));
+    const sub = el('div', 'dc-sub');
+    const prevPz = Array.isArray(prev.prazos) ? prev.prazos : [];
+    D.PRAZOS.forEach((P, k) => {
+      const pp = prevPz.find(x => x.chave === P.chave) || {};
+      const ate = D.addDias(baseData, P.dias);
+      const u = el('div', 'dc-unidade' + (pp.ok ? ' feita' : '')); u.id = `dc-pz-${index}-${P.chave}`;
+      const cab = el('div', 'dc-unidade-cab');
+      const nome = el('div'); nome.appendChild(el('div', 'dc-unidade-nome', `${P.rotulo} · ${P.dias} dias`)); nome.appendChild(el('div', 'dc-unidade-data', `até ${D.fmtAno(ate)}`));
+      cab.appendChild(nome);
+      cab.appendChild(checkbox(`dc-pz-chk-${index}-${P.chave}`, 'Concluído', pp.ok, v => { u.classList.toggle('feita', v); atualizarPrazos(index, v ? k : -1); }));
+      u.appendChild(cab);
+      u.appendChild(el('div', 'dc-anulado-msg', 'Anulado: você já concluiu a meta em um prazo anterior.'));
+      const corpo = el('div', 'dc-corpo');
+      corpo.appendChild(areaTexto(`dc-pz-txt-${index}-${P.chave}`, 'Motivo (se não conseguiu neste prazo)', 'Escreva o que dificultou cumprir a meta neste prazo...', pp.txt));
+      corpo.appendChild(blocoUpload(index, P.chave, 'Enviar comprovante'));
+      u.appendChild(corpo);
+      sub.appendChild(u);
+    });
+    card.appendChild(sub);
+    const nota = el('div', 'dc-nota');
+    nota.innerHTML = '<b>Como funcionam os prazos:</b> marque <b>Concluído</b> no prazo em que você atingiu a meta; os prazos seguintes ficam anulados. '
+      + 'Se não conseguiu no curto prazo (30 dias), escreva o motivo nele: o médio (60 dias) e o longo (90 dias) continuam valendo. '
+      + 'Se não conseguir se ajustar em nenhum, justifique cada prazo que já passou. O valor é o que você combinou com a sua mentora e pode ser revisto com ela.';
+    card.appendChild(nota);
+    setTimeout(() => { const i = D.PRAZOS.findIndex(P => (prevPz.find(x => x.chave === P.chave) || {}).ok); atualizarPrazos(index, i); }, 0);
+  }
+
+  // Tarefa simples: comprovação + justificativa
+  if (simples) {
+    if (info.evidencia) card.appendChild(blocoUpload(index, 't', 'Enviar comprovação (foto, print, PDF ou planilha)'));
+    card.appendChild(areaTexto('dc-txt-' + index, 'Motivo / justificativa (caso não tenha cumprido)', 'Escreva aqui se encontrou alguma dificuldade ou o motivo de não realização...', prev.justification));
+  }
+  return card;
+}
+
+// Ao concluir num prazo, os seguintes ficam anulados e desmarcados
+function atualizarPrazos(index, concluidoEm) {
+  D.PRAZOS.forEach((P, k) => {
+    const u = document.getElementById(`dc-pz-${index}-${P.chave}`); const chk = document.getElementById(`dc-pz-chk-${index}-${P.chave}`);
+    if (!u || !chk) return;
+    if (concluidoEm >= 0 && k !== concluidoEm && chk.checked) { chk.checked = false; chk.parentElement.classList.remove('ok'); u.classList.remove('feita'); }
+    const anulado = concluidoEm >= 0 && k > concluidoEm;
+    u.classList.toggle('anulada', anulado); chk.disabled = anulado;
+  });
+}
+
+async function loadTasks() {
+  if (!menteeId) { mostrarMensagem('Este link está incompleto. Peça à sua mentora para enviar o link do Dever de Casa novamente.'); return; }
+  if (!supabaseClient || !D) { mostrarMensagem('Não foi possível conectar. Verifique sua internet e recarregue a página.'); return; }
+  const { data, error } = await supabaseClient.rpc('dc_buscar_dever_de_casa', { p_mentorado_id: menteeId });
+  if (error) { console.error('Erro ao buscar tarefas:', error); mostrarMensagem('Não foi possível carregar suas tarefas agora. Recarregue a página em alguns instantes.'); return; }
+  const textos = data ? normalizarTarefas(data.tarefas) : [];
+  if (!textos.length) { mostrarMensagem('Nenhuma tarefa cadastrada no seu Dever de Casa até o momento. Sua mentora adicionará as tarefas alinhadas na sessão.'); return; }
+  const ajustes = ajustesDe(data.tarefas);
+  baseData = data.criado_em ? new Date(data.criado_em) : new Date();
+  currentTasks = textos.map(t => ({ texto: t, info: D.analisar(t, ajustes[t]) }));
+
+  const savedResp = (data.resposta_anterior && Array.isArray(data.resposta_anterior.tasks)) ? data.resposta_anterior.tasks : [];
+  const list = document.getElementById('dc-tasks-list'); list.innerHTML = '';
+  currentTasks.forEach((t, index) => {
+    const prev = savedResp.find(r => r.taskText === t.texto) || savedResp.find(r => r.taskIndex === index) || {};
+    arquivos[index] = (Array.isArray(prev.arquivos) ? prev.arquivos : []).filter(a => a && a.path);
+    list.appendChild(montarCard(t, index, prev));
+  });
+  const btn = document.getElementById('dc-submit-btn');
+  btn.textContent = savedResp.length ? 'Atualizar respostas para a mentora' : 'Enviar para a mentora';
+  btn.style.display = 'block';
+}
+
+function valorDe(id) { const e = document.getElementById(id); return e ? String(e.value || '').trim().slice(0, 2000) : ''; }
+function marcado(id) { const e = document.getElementById(id); return !!(e && e.checked); }
+
+// Monta as respostas e confere o que é obrigatório
+function coletar() {
+  const hoje = new Date(); const pendencias = [];
+  const responses = currentTasks.map((t, index) => {
+    const info = t.info;
+    const r = { taskIndex: index, taskText: t.texto, modo: info.sensivel ? (info.semanal ? 'semanal_prazos' : 'prazos') : (info.semanal ? 'semanal' : 'simples'), inicio: baseData.toISOString() };
+    const justs = [];
+    if (info.sensivel) {
+      r.valor = valorDe('dc-valor-' + index);
+      if (!r.valor) pendencias.push({ id: 'dc-valor-' + index, msg: `Tarefa ${index + 1}: informe o valor que você combinou com a sua mentora.` });
+    }
+    if (info.semanal) {
+      r.semanas = [];
+      for (let n = 1; n <= info.semanas; n++) {
+        const per = D.semanaPeriodo(baseData, n);
+        const s = { n, ok: marcado(`dc-sem-chk-${index}-${n}`), txt: valorDe(`dc-sem-txt-${index}-${n}`), periodo: `${D.fmt(per.ini)} a ${D.fmt(per.fim)}` };
+        r.semanas.push(s);
+        if (!s.ok && s.txt) justs.push(`${n}ª semana: ${s.txt}`);
+        if (!s.ok && !s.txt && D.addDias(per.fim, 1) <= hoje) pendencias.push({ id: `dc-sem-txt-${index}-${n}`, msg: `Tarefa ${index + 1}: a ${n}ª semana já terminou. Marque "Concluída" ou escreva o motivo.` });
+      }
+    }
+    if (info.sensivel) {
+      r.prazos = D.PRAZOS.map(P => ({ chave: P.chave, dias: P.dias, ok: marcado(`dc-pz-chk-${index}-${P.chave}`), txt: valorDe(`dc-pz-txt-${index}-${P.chave}`), ate: D.fmtAno(D.addDias(baseData, P.dias)) }));
+      const k = r.prazos.findIndex(x => x.ok);
+      r.prazos.forEach((x, i) => {
+        const P = D.PRAZOS[i];
+        if (k >= 0 && i > k) { x.txt = ''; return; } // anulado
+        if (!x.ok && x.txt) justs.push(`${P.rotulo}: ${x.txt}`);
+        const venceu = D.addDias(baseData, P.dias) <= hoje;
+        if (!x.ok && !x.txt && ((k >= 0 && i < k) || (k < 0 && venceu)))
+          pendencias.push({ id: `dc-pz-txt-${index}-${P.chave}`, msg: `Tarefa ${index + 1}: justifique por que a meta não foi atingida no ${P.rotulo.toLowerCase()} (${P.dias} dias).` });
+      });
+      r.prazoConcluido = k >= 0 ? r.prazos[k].chave : '';
+      r.completed = k >= 0;
+    } else if (info.semanal) {
+      r.completed = r.semanas.length > 0 && r.semanas.every(s => s.ok);
+    } else {
+      r.completed = marcado('dc-chk-' + index);
+      const j = valorDe('dc-txt-' + index); if (j) justs.push(j);
+    }
+    r.justification = justs.join(' | ').slice(0, 2000);
+    r.arquivos = (arquivos[index] || []).slice(0, 40).map(a => ({ slot: a.slot, path: a.path, nome: a.nome, tipo: a.tipo || '', tam: Number(a.tam) || 0 }));
+    return r;
+  });
+  return { responses, pendencias };
+}
+
+async function submitHomework() {
+  const btn = document.getElementById('dc-submit-btn');
+  const { responses, pendencias } = coletar();
+  document.querySelectorAll('.dc-erro').forEach(e => e.classList.remove('dc-erro'));
+  if (pendencias.length) {
+    pendencias.forEach(p => { const e = document.getElementById(p.id); if (e) e.classList.add('dc-erro'); });
+    const primeiro = document.getElementById(pendencias[0].id);
+    if (primeiro) { primeiro.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => primeiro.focus(), 300); }
+    alert('Falta pouco para enviar:\n\n' + pendencias.slice(0, 5).map(p => '• ' + p.msg).join('\n') + (pendencias.length > 5 ? `\n• e mais ${pendencias.length - 5} item(ns) marcados em vermelho.` : ''));
+    return;
+  }
+  const textoOriginal = btn.textContent; btn.disabled = true; btn.textContent = 'Enviando...';
+  const { error } = await supabaseClient.rpc('dc_enviar_dever_de_casa', { p_mentorado_id: menteeId, p_tarefas: responses });
+  if (error) {
+    console.error('Erro ao enviar respostas:', error);
+    btn.disabled = false; btn.textContent = textoOriginal;
+    alert('Suas respostas NÃO foram enviadas. Verifique sua internet e tente de novo. Nada do que você escreveu foi perdido.\n\nDetalhe: ' + (error.message || error));
+    return;
+  }
+  document.getElementById('dc-content').innerHTML = `<div class="dc-success-card"><span class="dc-badge">Respostas registradas</span>
+    <h2 class="dc-success-title">Dever de casa enviado!</h2>
+    <p class="dc-subtitle" style="border:none; margin-bottom:10px;">Suas marcações, comprovações e justificativas já estão com a sua mentora. Para atualizar a próxima semana ou corrigir algo, é só abrir este mesmo link de novo.</p></div>`;
+}
+
+window.onload = loadTasks;
+</script>
+</body>
+</html>

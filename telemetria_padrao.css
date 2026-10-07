@@ -1,0 +1,34 @@
+/* =====================================================================
+   Mentóra — PADRÃO VISUAL ÚNICO DAS 8 TELEMETRIAS (03/10/2026)
+   Carregado pela ponte (telemetria_ponte.js) em todas as telemetrias.
+   Mesma identidade da plataforma: roxo Mentóra para destaques, botões e escalas.
+   ===================================================================== */
+:root { --mt-roxo:#5B2DA3; --mt-roxo-esc:#4A2486; --mt-roxo-claro:#EDE9FE; --mt-azul:#4F46E5; }
+body { background:#F8FAFC !important; }
+.header h1 { font-style:normal !important; color:#1E293B !important; }
+.header h1 span { color:var(--mt-roxo) !important; }
+.card-box { border-radius:14px !important; }
+.section-header { color:var(--mt-roxo) !important; }
+.domain-icon { background:var(--mt-roxo) !important; color:#fff !important; }
+.domain-info h3 { color:var(--mt-roxo) !important; }
+.slider-value { color:var(--mt-roxo) !important; }
+input[type=range]::-webkit-slider-thumb { background:var(--mt-roxo) !important; }
+input[type=range]::-moz-range-thumb { background:var(--mt-roxo) !important; border:none; }
+input[type=range] { accent-color:var(--mt-roxo); }
+.finp:focus, .fsel:focus, .od-obs:focus { border-color:var(--mt-roxo) !important; box-shadow:0 0 0 3px rgba(91,45,163,.12); }
+.pill.active, .pill.active.mood-pill { background:var(--mt-roxo) !important; color:#fff !important; border-color:var(--mt-roxo) !important; }
+.btn-analisar, .salvar-btn { background:linear-gradient(135deg, var(--mt-roxo), var(--mt-azul)) !important; color:#fff !important; border:none !important; border-radius:100px !important; box-shadow:0 6px 18px rgba(91,45,163,.25); }
+.btn-analisar:hover, .salvar-btn:hover { background:linear-gradient(135deg, var(--mt-roxo-esc), var(--mt-roxo)) !important; }
+.btn-cancel { background:#fff !important; border:1.5px solid var(--mt-roxo) !important; color:var(--mt-roxo) !important; border-radius:100px !important; text-decoration:none; }
+.resultado-box { background:#F8F6FE !important; border:1px solid #E9E3FF !important; color:#1E293B !important; }
+/* celular: uma coluna, sem rolagem lateral */
+@media (max-width: 700px) {
+  .container { padding:0 .9rem !important; }
+  .header { padding:1.2rem 0 .5rem !important; }
+  .header h1 { font-size:22px !important; }
+  .form-row, .sliders-grid { grid-template-columns:1fr !important; gap:1rem !important; }
+  .card-box { padding:1rem !important; }
+  .footer-actions { flex-direction:column-reverse; }
+  .footer-actions > * { width:100%; justify-content:center; text-align:center; }
+  html, body { overflow-x:hidden; }
+}

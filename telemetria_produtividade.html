@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Análise de Produtividade</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { 
+            --purple: #5B2DA3; 
+            --blue: #3b82f6; 
+            --cyan: #06b6d4;
+            --indigo: #6366f1;
+            --green: #10b981;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --text: #1e293b; 
+            --text-muted: #64748B; 
+            --bg: #F8FAFC; 
+            --card: #ffffff; 
+            --border: #e2e8f0; 
+            --pill-bg: #f1f5f9;
+            --pill-text: #475569;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 4rem; }
+        
+        .header { padding: 2rem 0; margin-bottom: 1rem; }
+        .header h1 { font-family: 'Inter', sans-serif; font-size: 28px; margin-bottom: 0.5rem; color: #1e3a8a; font-weight: 700; }
+        .header h1 span { color: #1e3a8a; }
+        .header p { color: var(--text-muted); font-size: 14px; }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 1.5rem; }
+        
+        .card-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .fld { display: flex; flex-direction: column; gap: 0.5rem; }
+        .flbl { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .finp, .fsel { 
+            background: var(--bg); border: 1px solid var(--border); border-radius: 8px; 
+            padding: 0.75rem 1rem; color: var(--text); font-family: inherit; font-size: 14px; outline: none;
+        }
+        .finp:focus, .fsel:focus { border-color: var(--blue); }
+
+        .domain-header { display: flex; gap: 1rem; margin-bottom: 1.5rem; margin-top: 1rem; }
+        .domain-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; flex-shrink: 0; }
+        .domain-info h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600; }
+        .domain-info h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+        .domain-info p { font-size: 13px; color: var(--text-muted); }
+
+        .sliders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .slider-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; }
+        .slider-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .slider-name { font-size: 13px; font-weight: 500; color: var(--text); }
+        .slider-value { font-size: 16px; font-weight: 700; color: var(--blue); }
+        input[type=range] { width: 100%; -webkit-appearance: none; height: 4px; border-radius: 2px; outline: none; cursor: pointer; margin-bottom: 0.5rem; background: #E2E8F0; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--blue); cursor: pointer; border: none; }
+        .scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); }
+
+        .od-obs {
+            width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            padding: 1rem; color: var(--text); font-family: inherit; font-size: 13px; min-height: 80px;
+            resize: vertical; outline: none; margin-bottom: 2rem;
+        }
+        .od-obs:focus { border-color: var(--blue); }
+
+        .pills-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .pill {
+            background: var(--pill-bg); color: var(--pill-text); border: 1px solid var(--border);
+            padding: 0.4rem 0.8rem; border-radius: 100px; font-size: 12px; cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .pill.active { background: var(--blue); color: white; border-color: var(--blue); }
+        .pill.active.mood-pill { border-color: var(--green); color: var(--green); background: rgba(16,185,129,0.1); }
+
+        .footer-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+        .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-analisar { background: var(--blue); color: white; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-analisar:hover { background: #2563eb; }
+        .btn-analisar:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .resultado-box { display: none; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 1.5rem; margin-top: 2rem; line-height: 1.6; font-size: 14px; color: #1e3a8a; }
+    </style>
+</head>
+<body>
+    <div class="header container">
+        <h1>Nova <span>Análise de Produtividade</span></h1>
+        <p>Avalie cada indicador com base nas rotinas, organização e desempenho diário do mentorado</p>
+    </div>
+
+    <div class="container">
+        
+        <!-- CONTEXTO -->
+        <div class="card-box">
+            <div class="section-header">MENTORADO(A) & CONTEXTO</div>
+            <div class="form-row">
+                <div class="fld">
+                    <label class="flbl">MENTORADO(A)</label>
+                    <select class="fsel" id="sel-mentorado">
+                        <option value="">Selecione o mentorado(a)</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label class="flbl">DATA</label>
+                    <input class="finp" type="date" id="inp-data">
+                </div>
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+                <div class="fld">
+                    <label class="flbl">TIPO DE ENCONTRO</label>
+                    <select class="fsel" id="sel-encontro">
+                        <option value="">Selecione</option>
+                        <option>Sessão Individual</option>
+                        <option>Revisão de Metas</option>
+                        <option>Sessão de Planejamento</option>
+                        <option>Reunião de Feedback</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label class="flbl">Nº DA SESSÃO</label>
+                    <input class="finp" type="text" placeholder="Ex: 3" id="inp-sessao">
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMÍNIOS -->
+        <div class="card-box">
+            <div class="section-header">ESCALA DE OBSERVAÇÃO CLÍNICA DE PRODUTIVIDADE</div>
+            
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--cyan);">◈</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO I</h3>
+                        <h2>Foco & Gestão do Tempo</h2>
+                        <p>Capacidade de priorizar o que importa, blindar a agenda e cumprir prazos</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Capacidade de priorizar tarefas de alto impacto</span>
+                            <span class="slider-value" id="val-d1_pri" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_pri" data-color="var(--cyan)" oninput="updateSlider('d1_pri', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Manutenção de foco em blocos de tempo (Deep Work)</span>
+                            <span class="slider-value" id="val-d1_foco" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_foco" data-color="var(--cyan)" oninput="updateSlider('d1_foco', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Habilidade de blindar a agenda contra interrupções</span>
+                            <span class="slider-value" id="val-d1_blin" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_blin" data-color="var(--cyan)" oninput="updateSlider('d1_blin', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Cumprimento de prazos e estimativas de tempo</span>
+                            <span class="slider-value" id="val-d1_praz" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_praz" data-color="var(--cyan)" oninput="updateSlider('d1_praz', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre foco e tempo..."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--indigo);">◎</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO II</h3>
+                        <h2>Organização & Sistemas</h2>
+                        <p>Como o mentorado estrutura suas informações, delega e cria processos rotineiros</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Uso eficiente de ferramentas e sistemas de gestão</span>
+                            <span class="slider-value" id="val-d2_ferr" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_ferr" data-color="var(--indigo)" oninput="updateSlider('d2_ferr', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Organização de arquivos, e-mails e informações</span>
+                            <span class="slider-value" id="val-d2_org" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_org" data-color="var(--indigo)" oninput="updateSlider('d2_org', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Delegação eficaz de tarefas operacionais</span>
+                            <span class="slider-value" id="val-d2_del" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_del" data-color="var(--indigo)" oninput="updateSlider('d2_del', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Capacidade de criar e seguir processos rotineiros</span>
+                            <span class="slider-value" id="val-d2_proc" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_proc" data-color="var(--indigo)" oninput="updateSlider('d2_proc', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre organização e sistemas..."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--green);">◇</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO III</h3>
+                        <h2>Energia & Ritmo de Trabalho</h2>
+                        <p>Gestão do cansaço, pausas e sustentabilidade da produtividade a longo prazo</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Distribuição de energia ao longo do dia</span>
+                            <span class="slider-value" id="val-d3_ene" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_ene" data-color="var(--green)" oninput="updateSlider('d3_ene', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Frequência e qualidade das pausas para recuperação</span>
+                            <span class="slider-value" id="val-d3_pau" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_pau" data-color="var(--green)" oninput="updateSlider('d3_pau', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Disposição física e mental no fim do expediente</span>
+                            <span class="slider-value" id="val-d3_disp" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_disp" data-color="var(--green)" oninput="updateSlider('d3_disp', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Capacidade de evitar a exaustão e o burnout</span>
+                            <span class="slider-value" id="val-d3_exa" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_exa" data-color="var(--green)" oninput="updateSlider('d3_exa', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre energia e ritmo..."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--orange);">⊙</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO IV</h3>
+                        <h2>Tomada de Decisão & Execução</h2>
+                        <p>Velocidade de ação, finalização de projetos e resposta a imprevistos</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Velocidade na tomada de decisões difíceis</span>
+                            <span class="slider-value" id="val-d4_dec" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_dec" data-color="var(--orange)" oninput="updateSlider('d4_dec', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Capacidade de iniciar tarefas sem procrastinar</span>
+                            <span class="slider-value" id="val-d4_ini" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_ini" data-color="var(--orange)" oninput="updateSlider('d4_ini', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Finalização de projetos (acabativa vs. apenas iniciativa)</span>
+                            <span class="slider-value" id="val-d4_fin" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_fin" data-color="var(--orange)" oninput="updateSlider('d4_fin', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Resiliência frente a imprevistos no planejamento</span>
+                            <span class="slider-value" id="val-d4_res" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_res" data-color="var(--orange)" oninput="updateSlider('d4_res', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre tomada de decisão e execução..."></textarea>
+            </div>
+
+            <div class="domain-block" id="domain-5">
+                <div class="domain-header" style="justify-content: space-between;">
+                    <div style="display: flex; gap: 1rem;">
+                        <div class="domain-icon" style="background:var(--blue);">🎯</div>
+                        <div class="domain-info">
+                            <h3>DOMÍNIO V</h3>
+                            <h2>Metas & Visão Estratégica</h2>
+                            <p>Alinhamento de tarefas diárias com objetivos de longo prazo e métricas de sucesso</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" id="btn-toggle-d5" class="pill" onclick="toggleDomain5()" style="margin:0; border-color:var(--border);">Desativar Domínio</button>
+                    </div>
+                </div>
+                <div id="content-d5">
+                    <div class="sliders-grid">
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Alinhamento diário com objetivos de longo prazo</span>
+                                <span class="slider-value" id="val-d5_alin" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_alin" data-color="var(--blue)" oninput="updateSlider('d5_alin', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Clareza sobre métricas de sucesso e resultados</span>
+                                <span class="slider-value" id="val-d5_met" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_met" data-color="var(--blue)" oninput="updateSlider('d5_met', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Capacidade de dizer "não" a desvios de foco</span>
+                                <span class="slider-value" id="val-d5_nao" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_nao" data-color="var(--blue)" oninput="updateSlider('d5_nao', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Revisão e ajuste constante da rota</span>
+                                <span class="slider-value" id="val-d5_rev" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_rev" data-color="var(--blue)" oninput="updateSlider('d5_rev', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                    </div>
+                    <textarea class="od-obs" placeholder="Observações sobre visão estratégica..."></textarea>
+                </div>
+            </div>
+
+            <div style="margin-bottom:2rem; margin-top:-1rem;">
+                <div class="flbl" style="margin-bottom:0.75rem;">SABOTADORES DA PRODUTIVIDADE (GARGALOS OBSERVADOS)</div>
+                <div class="pills-container" id="gatilhos">
+                    <div class="pill">Procrastinação crônica</div><div class="pill">Multitarefa excessiva</div><div class="pill">Dificuldade em dizer "não"</div><div class="pill">Microgerenciamento</div><div class="pill">Vício em distrações digitais</div><div class="pill">Perfeccionismo paralisante</div><div class="pill">Falta de clareza nos objetivos</div><div class="pill">Reuniões improdutivas</div><div class="pill">Desorganização (caos físico/digital)</div><div class="pill">Fadiga de decisão</div><div class="pill">Dificuldade em delegar</div>
+                </div>
+            </div>
+            <textarea class="od-obs" placeholder="Descrição de como os sabotadores afetam a produtividade..."></textarea>
+
+        </div>
+
+        <!-- NOTAS FINAIS -->
+        <div class="card-box">
+            <div class="section-header">NOTAS GERAIS DA SESSÃO</div>
+            <textarea class="od-obs" id="notas-gerais" placeholder="Contexto, pontos de atenção, eventos relevantes observados..." style="margin-bottom:1.5rem;"></textarea>
+            
+            <div class="flbl" style="margin-bottom:0.75rem;">NÍVEL DE PRONTIDÃO / ESTADO PRODUTIVO OBSERVADO</div>
+            <div class="pills-container" id="prontidao">
+                <div class="pill mood-btn">Alta Performance (Flow)</div>
+                <div class="pill mood-btn">Produtivo, porém cansado</div>
+                <div class="pill mood-btn">Falso Produtivo (Ocupado sem avanço)</div>
+                <div class="pill mood-btn">Travado / Procrastinando</div>
+                <div class="pill mood-btn">Esgotado / Apagando incêndios</div>
+            </div>
+        </div>
+
+        <div class="footer-actions">
+            <button class="btn-cancel" onclick="MentoraPonte.voltar()">Voltar para Visão Geral</button>
+            <button class="btn-analisar" id="btn-analisar" onclick="salvarEAnalisar()">Salvar e gerar análise</button>
+        </div>
+
+        <div class="resultado-box" id="resultado">
+            <div style="font-weight:700; margin-bottom:1rem; font-size:16px;">📊 Análise de Produtividade (Agente Mentóra) Salva</div>
+            <div id="resultado-texto" style="white-space: pre-line;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const EDGE_URL = 'https://duhaqygpyamjelwxylmn.supabase.co/functions/v1/proxy-ia';
+        
+        document.getElementById('inp-data').valueAsDate = new Date();
+
+        function updateSlider(id, value, color) { 
+            const valEl = document.getElementById('val-'+id);
+            if(valEl) { valEl.textContent = value; valEl.style.color = color; }
+            const s = document.getElementById(id); 
+            if(s) {
+                const pct = value; 
+                s.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #E2E8F0 ${pct}%, #E2E8F0 100%)`; 
+            }
+        }
+
+        // Normal pills toggle
+        document.querySelectorAll('.pill:not(.mood-btn):not(#btn-toggle-d5)').forEach(p => {
+            p.addEventListener('click', () => {
+                p.classList.toggle('active');
+                if(p.classList.contains('active')) {
+                    p.style.backgroundColor = 'var(--blue)';
+                    p.style.borderColor = 'var(--blue)';
+                    p.style.color = 'white';
+                } else {
+                    p.style.backgroundColor = 'var(--pill-bg)';
+                    p.style.borderColor = 'var(--border)';
+                    p.style.color = 'var(--pill-text)';
+                }
+            });
+        });
+
+        // Mood pills act as radio buttons
+        document.querySelectorAll('.mood-btn').forEach(p => {
+            p.addEventListener('click', () => {
+                document.querySelectorAll('.mood-btn').forEach(m => {
+                    m.classList.remove('active', 'mood-pill');
+                    m.style.backgroundColor = 'var(--pill-bg)';
+                    m.style.borderColor = 'var(--border)';
+                    m.style.color = 'var(--pill-text)';
+                });
+                p.classList.add('active', 'mood-pill');
+                p.style.backgroundColor = 'rgba(16,185,129,0.1)';
+                p.style.borderColor = 'var(--green)';
+                p.style.color = 'var(--green)';
+            });
+        });
+
+        let d5Ativo = true;
+        function toggleDomain5() {
+            d5Ativo = !d5Ativo;
+            const btn = document.getElementById('btn-toggle-d5');
+            const content = document.getElementById('content-d5');
+            
+            if (!d5Ativo) {
+                btn.textContent = 'Ativar Domínio';
+                btn.style.backgroundColor = '#f1f5f9';
+                btn.style.color = '#94a3b8';
+                content.style.opacity = '0.3';
+                content.style.pointerEvents = 'none';
+            } else {
+                btn.textContent = 'Desativar Domínio';
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                content.style.opacity = '1';
+                content.style.pointerEvents = 'auto';
+            }
+        }
+
+        function getValuesStr() { 
+            let data = [];
+            data.push("Contexto:");
+            data.push(`- Mentorado(a): ${document.getElementById('sel-mentorado').value || 'Não informado'}`);
+            data.push(`- Tipo: ${document.getElementById('sel-encontro').value || 'Não informado'}`);
+            data.push(`- Sessão: ${document.getElementById('inp-sessao').value || 'N/A'}`);
+            
+            document.querySelectorAll('.domain-block').forEach(dom => {
+                if (dom.id === 'domain-5' && !d5Ativo) return; // Ignore se o domínio for o 5 e estiver desativado
+
+                let title = dom.querySelector('h2').textContent;
+                data.push("\n## " + title);
+                dom.querySelectorAll('.slider-wrap').forEach(sw => {
+                    let name = sw.querySelector('.slider-name').textContent;
+                    let val = sw.querySelector('input').value;
+                    data.push(`- ${name}: ${val}/100`);
+                });
+                let obs = dom.querySelector('textarea');
+                if(obs && obs.value.trim()) {
+                    data.push(`- Observação: ${obs.value.trim()}`);
+                }
+            });
+
+            let gatilhos = Array.from(document.querySelectorAll('#gatilhos .pill.active')).map(p => p.textContent);
+            if(gatilhos.length > 0) data.push("\n## Sabotadores da Produtividade: " + gatilhos.join(', '));
+
+            let geral = document.getElementById('notas-gerais').value;
+            if(geral.trim()) data.push("\n## Notas Gerais: " + geral.trim());
+
+            let humor = document.querySelector('.mood-btn.active');
+            if(humor) data.push("## Estado Produtivo: " + humor.textContent);
+
+            return data.join('\n');
+        }
+
+        async function salvarEAnalisar() {
+            const btn=document.getElementById('btn-analisar'), resultBox=document.getElementById('resultado'), resultText=document.getElementById('resultado-texto');
+            btn.disabled=true; btn.textContent='Salvando...';
+            
+            const indStr = getValuesStr();
+            const prompt = ''; // a análise com o Agente Mentóra é feita na Visão Geral (os textos de instrução ficam no servidor);
+            
+            await MentoraPonte.analisarESalvar({
+                tipo: 'produtividade', titulo: 'Telemetria de Produtividade & Foco', indStr, prompt,
+                btn, resultBox, resultText, textoBotao: '🌐 Salvar & Gerar Análise com Agente Mentóra'
+            });
+        }
+
+        // Init ranges
+        document.querySelectorAll('input[type=range]').forEach(s => {
+            updateSlider(s.id, s.value, s.dataset.color);
+        });
+        
+        // Load mentees if function exists from main page
+        if(typeof getMentees === 'function') {
+            const ms = getMentees();
+            const sel = document.getElementById('sel-mentorado');
+            ms.forEach(m => {
+                { const o = document.createElement('option'); o.value = m.id; o.textContent = m.nome || 'Mentorado'; sel.appendChild(o); }
+            });
+        }
+    </script>
+    <script src="telemetria_ponte.js?v=20261003b"></script>
+
+<style id="tele-pdf-estilo">
+.btn-pdf-tele { background:#fff; color:#5B2DA3; border:1.5px solid #5B2DA3; border-radius:8px; padding:0.75rem 1.25rem; font-size:14px; font-weight:600; cursor:pointer; }
+.btn-pdf-tele:hover { background:#F5F3FF; }
+@media print {
+  .footer-actions, button, .btn-pdf-tele { display:none !important; }
+  body { background:#fff !important; }
+  .resultado-box:empty { display:none !important; }
+  * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+<script>
+// Baixar PDF da telemetria: abre a impressão do navegador (escolha "Salvar como PDF")
+function baixarPDFTelemetria() {
+  var tituloOrig = document.title;
+  var d = new Date();
+  var sel = document.querySelector('select');
+  var nome = sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
+  document.title = 'Mentora - ' + tituloOrig + (nome && !/selecion/i.test(nome) ? ' - ' + nome : '') + ' - ' + d.toLocaleDateString('pt-BR').replace(/\//g, '-');
+  var res = document.getElementById('resultado');
+  var estavaOculto = res && getComputedStyle(res).display === 'none' && (document.getElementById('resultado-texto') || {}).textContent;
+  if (estavaOculto) res.style.display = 'block';
+  setTimeout(function () { window.print(); document.title = tituloOrig; }, 100);
+}
+</script>
+</body>
+</html>

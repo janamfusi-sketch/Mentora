@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Análise de Transição de Carreira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { 
+            --purple: #5B2DA3; 
+            --blue: #3b82f6; 
+            --cyan: #06b6d4;
+            --indigo: #6366f1;
+            --green: #10b981;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --text: #1e293b; 
+            --text-muted: #64748B; 
+            --bg: #F8FAFC; 
+            --card: #ffffff; 
+            --border: #e2e8f0; 
+            --pill-bg: #f1f5f9;
+            --pill-text: #475569;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 4rem; }
+        
+        .header { padding: 2rem 0; margin-bottom: 1rem; }
+        .header h1 { font-family: 'Inter', sans-serif; font-size: 28px; margin-bottom: 0.5rem; color: #1e3a8a; font-weight: 700; }
+        .header h1 span { color: #1e3a8a; }
+        .header p { color: var(--text-muted); font-size: 14px; }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 1.5rem; }
+        
+        .card-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .fld { display: flex; flex-direction: column; gap: 0.5rem; }
+        .flbl { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .finp, .fsel { 
+            background: var(--bg); border: 1px solid var(--border); border-radius: 8px; 
+            padding: 0.75rem 1rem; color: var(--text); font-family: inherit; font-size: 14px; outline: none;
+        }
+        .finp:focus, .fsel:focus { border-color: var(--indigo); }
+
+        .domain-header { display: flex; gap: 1rem; margin-bottom: 1.5rem; margin-top: 1rem; }
+        .domain-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; flex-shrink: 0; }
+        .domain-info h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600; }
+        .domain-info h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+        .domain-info p { font-size: 13px; color: var(--text-muted); }
+
+        .sliders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .slider-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; }
+        .slider-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .slider-name { font-size: 13px; font-weight: 500; color: var(--text); }
+        .slider-value { font-size: 16px; font-weight: 700; color: var(--indigo); }
+        input[type=range] { width: 100%; -webkit-appearance: none; height: 4px; border-radius: 2px; outline: none; cursor: pointer; margin-bottom: 0.5rem; background: #E2E8F0; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--indigo); cursor: pointer; border: none; }
+        .scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); }
+
+        .od-obs {
+            width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            padding: 1rem; color: var(--text); font-family: inherit; font-size: 13px; min-height: 80px;
+            resize: vertical; outline: none; margin-bottom: 2rem;
+        }
+        .od-obs:focus { border-color: var(--indigo); }
+
+        .pills-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .pill {
+            background: var(--pill-bg); color: var(--pill-text); border: 1px solid var(--border);
+            padding: 0.4rem 0.8rem; border-radius: 100px; font-size: 12px; cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .pill.active { background: var(--indigo); color: white; border-color: var(--indigo); }
+        .pill.active.mood-pill { border-color: var(--green); color: var(--green); background: rgba(16,185,129,0.1); }
+
+        .footer-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+        .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-analisar { background: var(--indigo); color: white; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-analisar:hover { background: #4f46e5; }
+        .btn-analisar:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .resultado-box { display: none; background: #eef2ff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 1.5rem; margin-top: 2rem; line-height: 1.6; font-size: 14px; color: #3730a3; }
+    </style>
+</head>
+<body>
+    <div class="header container">
+        <h1>Nova <span>Análise de Transição de Carreira</span></h1>
+        <p>Diagnóstico clínico sobre o nível de prontidão, estrutura e maturidade do mentorado para a mudança profissional</p>
+    </div>
+
+    <div class="container">
+        
+        <!-- CONTEXTO -->
+        <div class="card-box">
+            <div class="section-header">MENTORADO(A) & CONTEXTO</div>
+            <div class="form-row">
+                <div class="fld">
+                    <label class="flbl">MENTORADO(A)</label>
+                    <select class="fsel" id="sel-mentorado">
+                        <option value="">Selecione o mentorado(a)</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label class="flbl">DATA</label>
+                    <input class="finp" type="date" id="inp-data">
+                </div>
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+                <div class="fld">
+                    <label class="flbl">TIPO DE ENCONTRO</label>
+                    <select class="fsel" id="sel-encontro">
+                        <option value="">Selecione</option>
+                        <option>Sessão de Diagnóstico</option>
+                        <option>Sessão de Estratégia</option>
+                        <option>Revisão de Plano de Ação</option>
+                        <option>Fechamento/Alinhamento</option>
+                    </select>
+                </div>
+                <div class="fld">
+                    <label class="flbl">Nº DA SESSÃO</label>
+                    <input class="finp" type="text" placeholder="Ex: 3" id="inp-sessao">
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMÍNIOS -->
+        <div class="card-box">
+            <div class="section-header">ESCALA CLÍNICA DE TRANSIÇÃO DE CARREIRA</div>
+            
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--cyan);">◈</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO I</h3>
+                        <h2>Clareza de Visão & Autoconhecimento</h2>
+                        <p>Nível de consciência sobre os reais motivos da transição, pontos fortes e valores</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Clareza sobre os reais motivos que impulsionam a transição</span>
+                            <span class="slider-value" id="val-d1_mot" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_mot" data-color="var(--cyan)" oninput="updateSlider('d1_mot', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Consciência das próprias habilidades transferíveis e diferenciais</span>
+                            <span class="slider-value" id="val-d1_hab" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_hab" data-color="var(--cyan)" oninput="updateSlider('d1_hab', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Compreensão de quais valores são inegociáveis na nova fase</span>
+                            <span class="slider-value" id="val-d1_val" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_val" data-color="var(--cyan)" oninput="updateSlider('d1_val', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Visão realista de onde deseja estar a médio e longo prazo</span>
+                            <span class="slider-value" id="val-d1_vis" style="color:var(--cyan);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d1_vis" data-color="var(--cyan)" oninput="updateSlider('d1_vis', this.value, 'var(--cyan)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre clareza e autoconhecimento..."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--indigo);">◎</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO II</h3>
+                        <h2>Planejamento Financeiro & Estrutural</h2>
+                        <p>Base material e financeira para suportar os riscos da mudança de carreira</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Nível de segurança e reserva financeira para a transição</span>
+                            <span class="slider-value" id="val-d2_res" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_res" data-color="var(--indigo)" oninput="updateSlider('d2_res', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Estruturação de um "Plano B" caso os resultados demorem</span>
+                            <span class="slider-value" id="val-d2_plb" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_plb" data-color="var(--indigo)" oninput="updateSlider('d2_plb', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Clareza sobre as adequações no padrão de vida atual</span>
+                            <span class="slider-value" id="val-d2_pad" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_pad" data-color="var(--indigo)" oninput="updateSlider('d2_pad', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Capacidade de investir recursos sem comprometer a subsistência</span>
+                            <span class="slider-value" id="val-d2_inv" style="color:var(--indigo);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d2_inv" data-color="var(--indigo)" oninput="updateSlider('d2_inv', this.value, 'var(--indigo)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre planejamento financeiro e estrutural..."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--green);">◇</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO III</h3>
+                        <h2>Estratégia de Mercado & Posicionamento</h2>
+                        <p>Entendimento do novo mercado, construção de networking e proposta de valor</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Entendimento profundo das dores/demandas do novo mercado</span>
+                            <span class="slider-value" id="val-d3_mer" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_mer" data-color="var(--green)" oninput="updateSlider('d3_mer', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Qualidade e intencionalidade do Networking (rede de contatos)</span>
+                            <span class="slider-value" id="val-d3_net" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_net" data-color="var(--green)" oninput="updateSlider('d3_net', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Clareza sobre o próprio modelo de negócio ou proposta de valor</span>
+                            <span class="slider-value" id="val-d3_prop" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_prop" data-color="var(--green)" oninput="updateSlider('d3_prop', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Eficiência no posicionamento de autoridade e marca pessoal</span>
+                            <span class="slider-value" id="val-d3_pos" style="color:var(--green);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d3_pos" data-color="var(--green)" oninput="updateSlider('d3_pos', this.value, 'var(--green)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre mercado e posicionamento..."></textarea>
+            </div>
+
+            <div class="domain-block">
+                <div class="domain-header">
+                    <div class="domain-icon" style="background:var(--orange);">⊙</div>
+                    <div class="domain-info">
+                        <h3>DOMÍNIO IV</h3>
+                        <h2>Preparação Técnica & Execução</h2>
+                        <p>Nível de preparo técnico atual e velocidade de adaptação à nova realidade</p>
+                    </div>
+                </div>
+                <div class="sliders-grid">
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Nível de preparo técnico frente às exigências do novo mercado</span>
+                            <span class="slider-value" id="val-d4_tec" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_tec" data-color="var(--orange)" oninput="updateSlider('d4_tec', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Velocidade de aprendizado e adaptação a novas ferramentas</span>
+                            <span class="slider-value" id="val-d4_apr" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_apr" data-color="var(--orange)" oninput="updateSlider('d4_apr', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Disciplina na execução diária do plano de transição (ações concretas)</span>
+                            <span class="slider-value" id="val-d4_exe" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_exe" data-color="var(--orange)" oninput="updateSlider('d4_exe', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-label">
+                            <span class="slider-name">Capacidade de pivotar a estratégia diante de testes práticos</span>
+                            <span class="slider-value" id="val-d4_piv" style="color:var(--orange);">50</span>
+                        </div>
+                        <input type="range" min="1" max="100" value="50" id="d4_piv" data-color="var(--orange)" oninput="updateSlider('d4_piv', this.value, 'var(--orange)')">
+                        <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                    </div>
+                </div>
+                <textarea class="od-obs" placeholder="Observações sobre preparação e execução técnica..."></textarea>
+            </div>
+
+            <div class="domain-block" id="domain-5">
+                <div class="domain-header" style="justify-content: space-between;">
+                    <div style="display: flex; gap: 1rem;">
+                        <div class="domain-icon" style="background:var(--blue);">🛡️</div>
+                        <div class="domain-info">
+                            <h3>DOMÍNIO V</h3>
+                            <h2>Resiliência Emocional & Gestão do Risco</h2>
+                            <p>Gestão das pressões internas e externas durante a transição profissional</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" id="btn-toggle-d5" class="pill" onclick="toggleDomain5()" style="margin:0; border-color:var(--border);">Desativar Domínio</button>
+                    </div>
+                </div>
+                <div id="content-d5">
+                    <div class="sliders-grid">
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Capacidade de lidar com a insegurança e a Síndrome do Impostor</span>
+                                <span class="slider-value" id="val-d5_ins" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_ins" data-color="var(--blue)" oninput="updateSlider('d5_ins', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Tolerância ao risco e à frustração diante de rejeições ou falhas</span>
+                                <span class="slider-value" id="val-d5_tol" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_tol" data-color="var(--blue)" oninput="updateSlider('d5_tol', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Habilidade de se blindar contra pressões externas (família, sociedade)</span>
+                                <span class="slider-value" id="val-d5_bli" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_bli" data-color="var(--blue)" oninput="updateSlider('d5_bli', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                        <div class="slider-wrap">
+                            <div class="slider-label">
+                                <span class="slider-name">Estabilidade emocional durante picos de incerteza financeira</span>
+                                <span class="slider-value" id="val-d5_est" style="color:var(--blue);">50</span>
+                            </div>
+                            <input type="range" min="1" max="100" value="50" id="d5_est" data-color="var(--blue)" oninput="updateSlider('d5_est', this.value, 'var(--blue)')">
+                            <div class="scale-labels"><span>Baixo</span><span>Médio</span><span>Alto</span></div>
+                        </div>
+                    </div>
+                    <textarea class="od-obs" placeholder="Observações sobre resiliência e riscos..."></textarea>
+                </div>
+            </div>
+
+            <div style="margin-bottom:2rem; margin-top:-1rem;">
+                <div class="flbl" style="margin-bottom:0.75rem;">SABOTADORES DA TRANSIÇÃO (GARGALOS OBSERVADOS)</div>
+                <div class="pills-container" id="gatilhos">
+                    <div class="pill">Paralisação por análise (excesso de planos sem ação)</div><div class="pill">Síndrome do impostor ("não estou pronto")</div><div class="pill">Apego ao status da carreira anterior</div><div class="pill">Medo do julgamento alheio</div><div class="pill">Pressa por resultados imediatos</div><div class="pill">Baixo networking na nova área</div><div class="pill">Comparação tóxica com veteranos da área</div><div class="pill">Falta de foco (atirando para todos os lados)</div><div class="pill">Desorganização financeira para suportar a mudança</div><div class="pill">Orgulho (dificuldade em recomeçar "de baixo")</div>
+                </div>
+            </div>
+            <textarea class="od-obs" placeholder="Descrição de como os sabotadores afetam o processo de transição..."></textarea>
+
+        </div>
+
+        <!-- NOTAS FINAIS -->
+        <div class="card-box">
+            <div class="section-header">NOTAS GERAIS DA SESSÃO</div>
+            <textarea class="od-obs" id="notas-gerais" placeholder="Contexto, pontos de atenção, eventos relevantes observados..." style="margin-bottom:1.5rem;"></textarea>
+            
+            <div class="flbl" style="margin-bottom:0.75rem;">NÍVEL DE PRONTIDÃO PARA A TRANSIÇÃO</div>
+            <div class="pills-container" id="prontidao">
+                <div class="pill mood-btn">Decidido e em Execução Contínua</div>
+                <div class="pill mood-btn">Planejando com Estrutura e Calma</div>
+                <div class="pill mood-btn">Confuso / Patinando nas Ideias</div>
+                <div class="pill mood-btn">Paralisado pelo Medo ou Insegurança</div>
+                <div class="pill mood-btn">Acomodado na Zona de Conforto Atual</div>
+            </div>
+        </div>
+
+        <div class="footer-actions">
+            <button class="btn-cancel" onclick="MentoraPonte.voltar()">Voltar para Visão Geral</button>
+            <button class="btn-analisar" id="btn-analisar" onclick="salvarEAnalisar()">Salvar e gerar análise</button>
+        </div>
+
+        <div class="resultado-box" id="resultado">
+            <div style="font-weight:700; margin-bottom:1rem; font-size:16px;">📊 Análise de Transição de Carreira (Agente Mentóra) Salva</div>
+            <div id="resultado-texto" style="white-space: pre-line;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const EDGE_URL = 'https://duhaqygpyamjelwxylmn.supabase.co/functions/v1/proxy-ia';
+        
+        document.getElementById('inp-data').valueAsDate = new Date();
+
+        function updateSlider(id, value, color) { 
+            const valEl = document.getElementById('val-'+id);
+            if(valEl) { valEl.textContent = value; valEl.style.color = color; }
+            const s = document.getElementById(id); 
+            if(s) {
+                const pct = value; 
+                s.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #E2E8F0 ${pct}%, #E2E8F0 100%)`; 
+            }
+        }
+
+        // Normal pills toggle
+        document.querySelectorAll('.pill:not(.mood-btn):not(#btn-toggle-d5)').forEach(p => {
+            p.addEventListener('click', () => {
+                p.classList.toggle('active');
+                if(p.classList.contains('active')) {
+                    p.style.backgroundColor = 'var(--indigo)';
+                    p.style.borderColor = 'var(--indigo)';
+                    p.style.color = 'white';
+                } else {
+                    p.style.backgroundColor = 'var(--pill-bg)';
+                    p.style.borderColor = 'var(--border)';
+                    p.style.color = 'var(--pill-text)';
+                }
+            });
+        });
+
+        // Mood pills act as radio buttons
+        document.querySelectorAll('.mood-btn').forEach(p => {
+            p.addEventListener('click', () => {
+                document.querySelectorAll('.mood-btn').forEach(m => {
+                    m.classList.remove('active', 'mood-pill');
+                    m.style.backgroundColor = 'var(--pill-bg)';
+                    m.style.borderColor = 'var(--border)';
+                    m.style.color = 'var(--pill-text)';
+                });
+                p.classList.add('active', 'mood-pill');
+                p.style.backgroundColor = 'rgba(16,185,129,0.1)';
+                p.style.borderColor = 'var(--green)';
+                p.style.color = 'var(--green)';
+            });
+        });
+
+        let d5Ativo = true;
+        function toggleDomain5() {
+            d5Ativo = !d5Ativo;
+            const btn = document.getElementById('btn-toggle-d5');
+            const content = document.getElementById('content-d5');
+            
+            if (!d5Ativo) {
+                btn.textContent = 'Ativar Domínio';
+                btn.style.backgroundColor = '#f1f5f9';
+                btn.style.color = '#94a3b8';
+                content.style.opacity = '0.3';
+                content.style.pointerEvents = 'none';
+            } else {
+                btn.textContent = 'Desativar Domínio';
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                content.style.opacity = '1';
+                content.style.pointerEvents = 'auto';
+            }
+        }
+
+        function getValuesStr() { 
+            let data = [];
+            data.push("Contexto:");
+            data.push(`- Mentorado(a): ${document.getElementById('sel-mentorado').value || 'Não informado'}`);
+            data.push(`- Tipo: ${document.getElementById('sel-encontro').value || 'Não informado'}`);
+            data.push(`- Sessão: ${document.getElementById('inp-sessao').value || 'N/A'}`);
+            
+            document.querySelectorAll('.domain-block').forEach(dom => {
+                if (dom.id === 'domain-5' && !d5Ativo) return; // Ignora se o Domínio V estiver desativado
+
+                let title = dom.querySelector('h2').textContent;
+                data.push("\n## " + title);
+                dom.querySelectorAll('.slider-wrap').forEach(sw => {
+                    let name = sw.querySelector('.slider-name').textContent;
+                    let val = sw.querySelector('input').value;
+                    data.push(`- ${name}: ${val}/100`);
+                });
+                let obs = dom.querySelector('textarea');
+                if(obs && obs.value.trim()) {
+                    data.push(`- Observação: ${obs.value.trim()}`);
+                }
+            });
+
+            let gatilhos = Array.from(document.querySelectorAll('#gatilhos .pill.active')).map(p => p.textContent);
+            if(gatilhos.length > 0) data.push("\n## Sabotadores da Transição: " + gatilhos.join(', '));
+
+            let geral = document.getElementById('notas-gerais').value;
+            if(geral.trim()) data.push("\n## Notas Gerais: " + geral.trim());
+
+            let humor = document.querySelector('.mood-btn.active');
+            if(humor) data.push("## Nível de Prontidão para Transição: " + humor.textContent);
+
+            return data.join('\n');
+        }
+
+        async function salvarEAnalisar() {
+            const btn=document.getElementById('btn-analisar'), resultBox=document.getElementById('resultado'), resultText=document.getElementById('resultado-texto');
+            btn.disabled=true; btn.textContent='Salvando...';
+            
+            const indStr = getValuesStr();
+            const prompt = ''; // a análise com o Agente Mentóra é feita na Visão Geral (os textos de instrução ficam no servidor);
+            
+            await MentoraPonte.analisarESalvar({
+                tipo: 'transicao', titulo: 'Telemetria de Transição de Carreira', indStr, prompt,
+                btn, resultBox, resultText, textoBotao: '🌐 Salvar & Gerar Análise com Agente Mentóra'
+            });
+        }
+
+        // Init ranges
+        document.querySelectorAll('input[type=range]').forEach(s => {
+            updateSlider(s.id, s.value, s.dataset.color);
+        });
+        
+        // Load mentees if function exists from main page
+        if(typeof getMentees === 'function') {
+            const ms = getMentees();
+            const sel = document.getElementById('sel-mentorado');
+            ms.forEach(m => {
+                { const o = document.createElement('option'); o.value = m.id; o.textContent = m.nome || 'Mentorado'; sel.appendChild(o); }
+            });
+        }
+    </script>
+    <script src="telemetria_ponte.js?v=20261003b"></script>
+
+<style id="tele-pdf-estilo">
+.btn-pdf-tele { background:#fff; color:#5B2DA3; border:1.5px solid #5B2DA3; border-radius:8px; padding:0.75rem 1.25rem; font-size:14px; font-weight:600; cursor:pointer; }
+.btn-pdf-tele:hover { background:#F5F3FF; }
+@media print {
+  .footer-actions, button, .btn-pdf-tele { display:none !important; }
+  body { background:#fff !important; }
+  .resultado-box:empty { display:none !important; }
+  * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+<script>
+// Baixar PDF da telemetria: abre a impressão do navegador (escolha "Salvar como PDF")
+function baixarPDFTelemetria() {
+  var tituloOrig = document.title;
+  var d = new Date();
+  var sel = document.querySelector('select');
+  var nome = sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
+  document.title = 'Mentora - ' + tituloOrig + (nome && !/selecion/i.test(nome) ? ' - ' + nome : '') + ' - ' + d.toLocaleDateString('pt-BR').replace(/\//g, '-');
+  var res = document.getElementById('resultado');
+  var estavaOculto = res && getComputedStyle(res).display === 'none' && (document.getElementById('resultado-texto') || {}).textContent;
+  if (estavaOculto) res.style.display = 'block';
+  setTimeout(function () { window.print(); document.title = tituloOrig; }, 100);
+}
+</script>
+</body>
+</html>
